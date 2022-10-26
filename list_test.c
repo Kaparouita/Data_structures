@@ -61,82 +61,93 @@ void print_table(node node)
     return;
 }
 
+void printList(flight head)
+{
+    flight temp = head;
+    while (temp != NULL)
+    {
+        printf("%d ", temp->id);
+        temp = temp->next;
+    }
+}
+
 /*b i)*/
 /*den xreiazonte ta head afou sthn askhsh pernw to prwto*/
 node SetMinus(node a, node b)
 {
     node c = createNode();
+    reverse(a);
     int num_a, num_b;
-    /*vres to teuletaio ths b*/
-    while (b->head->next != NULL)
-    {
-        b->head = b->head->next;
-    }
+
     while (a->head != NULL)
     {
         num_a = a->head->id;
         num_b = b->head->id;
-        /* an einai mikrotero tote den yparxei sthn b, an h b exei teliwsei tote pali den yparxei sthn b to stoixeio*/
-        if (num_a < num_b || b->head->prev == NULL)
+        /* an einai megalytero tote den yparxei sthn b, an h b exei teliwsei tote pali den yparxei sthn b to stoixeio*/
+        if (num_a > num_b || b->head->next == NULL)
         {
-            node_put(c, num_a);
+            if (num_a != num_b) /*se periptwsh p to teleutaio tou b einai iso me kapoio a*/
+                node_put(c, num_a);
             a->head = a->head->next;
         }
-        /*an to a einai megalytero b++*/
-        else if (num_a > num_b)
+        /*an to a einai mikrotero b++*/
+        else if (num_a < num_b)
         {
-            b->head = b->head->prev;
+            b->head = b->head->next;
         }
         /*an einai isa kai ta dyo ++*/
         else if (num_a == num_b)
         {
             a->head = a->head->next;
-            b->head = b->head->prev;
+            b->head = b->head->next;
         }
     }
     return c;
 }
 
-void SetMinus2(flight a, flight b, node c)
+node helper(flight a, flight b, node c)
 {
-    int arr[100] = {0};
-    printf("\n : %d", b->id);
-
-    if (a->next == NULL)
-        return;
-    else if (b->next == NULL)
+    if (a == NULL)
+        return c;
+    else if (a->id > b->id || b->next == NULL)
     {
-        int i = 0, j = 0;
-        while (i < 6)
+        if (a->id != b->id) /*se periptwsh p to teleutaio tou b einai iso me kapoio a*/
         {
-
-            if (arr[j] != 0)
-            {
-                printf("\n : %d", arr[j]);
-                i++;
-            }
-
-            j++;
+            node_put(c, a->id);
         }
-        return;
-        node_put(c, a->id);
-        SetMinus2(a->next, b, c);
+        printf("%d ", a->id);
+        helper((a->next), b, c);
     }
-    else if (b->id < a->id)
+    else if (a->id < b->id)
     {
-        printf("\n : %d", b->id);
-        SetMinus2(a, b->next, c);
+        helper(a, (b->next), c);
     }
-    else if (b->id == a->id)
+    else if (a->id == b->id)
     {
-        SetMinus2(a->next, b, c);
+        helper((a->next), (b->next), c);
     }
-    else
-    {
-        arr[b->id] = b->id;
-        SetMinus2(a, b->next, c);
+}
+node SetMinus2(node a, node b)
+{
+    reverse(a);
+    return (helper(a->head, b->head, createNode()));
+}
+
+void reverse(flight *head_ref)
+{
+    flight prev = NULL;
+    flight current = *head_ref;
+    flight next = NULL;
+    while (current != NULL)
+    { // Store next
+        next = current->next;
+        // Reverse current node's pointer
+        current->next = prev;
+        // Move pointers one position ahead.
+        prev = current;
+        current = next;
     }
-    return;
+    *head_ref = prev;
 }
 
 int main()
@@ -145,7 +156,6 @@ int main()
     node b = createNode();
     node c = createNode();
 
-    node_put(a, 42);
     node_put(a, 40);
     node_put(a, 36);
     node_put(a, 25);
@@ -165,9 +175,12 @@ int main()
     node_put(b, 15);
     node_put(b, 20);
     node_put(b, 36);
+    node_put(b, 38);
 
-    SetMinus2(a->head, b->head, c);
+    // printList(a->head);
+    c = SetMinus2(a, b);
 
-    // print_table(c);
+    print_table(c);
+
     return 0;
 }

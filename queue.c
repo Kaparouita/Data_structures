@@ -25,9 +25,18 @@ Queue *createQueue(unsigned capacity)
     queue->size = 0;
 
     // This is important, see the enqueue
-    queue->array = (char *)malloc(
-        queue->capacity * sizeof(char));
+    queue->array = (int *)malloc(
+        queue->capacity * sizeof(int));
     return queue;
+}
+
+void printQ(Queue *q)
+{
+
+    for (int i = 0; i < q->size; i++)
+    {
+        printf(" %d ,", q->array[i]);
+    }
 }
 
 // Queue is full when size becomes
@@ -44,7 +53,7 @@ int isEmpty(Queue *queue)
 }
 
 // Function to add an item to the queue.
-void enqueue(Queue *Q, char item)
+void enqueue(Queue *Q, int item)
 {
     if (isFull(Q))
         return;
@@ -57,18 +66,18 @@ void enqueue(Queue *Q, char item)
 }
 // Function to remove an item from queue.
 // It changes front and size
-char dequeue(Queue *queue)
+int dequeue(Queue *queue)
 {
     if (isEmpty(queue))
         return '0';
-    char item = queue->array[queue->front];
+    int item = queue->array[queue->front];
     queue->front = (queue->front + 1) % queue->capacity;
     queue->size = queue->size - 1;
     return item;
 }
 
 // Function to get front of queue
-char front(Queue *queue)
+int front(Queue *queue)
 {
     if (isEmpty(queue))
         return '0';

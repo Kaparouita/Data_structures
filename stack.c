@@ -58,3 +58,4 @@ char peek(Stack *stack)
         return '0';
     return stack->array[stack->top];
 }
+

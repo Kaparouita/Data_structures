@@ -3,31 +3,50 @@
 #include "queue.c"
 #include <math.h>
 // ginete arnhtiko num,k?
-void ZigZag(Queue *Q, int k)
+void ZigZag(Queue *Q1, int k)
 {
-    enqueue(Q, -1);
-    int tmp = k, num, n;
-    while (k > 0)
+    Queue *Q2 = createQueue(100);
+    if (isEmpty(Q1))
     {
-        if (front(Q) == -1)
+        return; /*q is empty*/
+    }
+    int num, n = get_Q_size(Q1, Q2);
+    /*get the item value*/
+    num = get_Q_item(Q2, Q1, k);
+
+    if (n < k)
+    {
+        num = n - num;
+    }
+    printQ(Q1);
+}
+
+int get_Q_size(Queue *Q1, Queue *Q2)
+{
+    int i = 1;
+    while (!isEmpty(Q1))
+    {
+        enqueue(Q2, dequeue(Q1));
+        i++;
+    }
+    return i;
+}
+int get_Q_item(Queue *Q1, Queue *Q2, int index)
+{
+    int tmp;
+    while (index > 0)
+    {
+        if (isEmpty(Q1))
         {
-            n = tmp - k + 1;
             break;
         }
-        enqueue(Q, dequeue(Q));
-        k--;
+        tmp = dequeue(Q1);
+        enqueue(Q2, tmp); /*remove the item from first list and put it on the tempory list*/
+        index--;
     }
-    num = front(Q);
-    k = (int)fmin(num, tmp);
-    while (front(Q) != -1)
-    {
-        enqueue(Q, dequeue(Q));
-    }
-
-    while (k > 0)
-    {
-    }
-    printQ(Q);
+    while (!isEmpty(Q1))
+        enqueue(Q2, dequeue(Q1));
+    return tmp;
 }
 
 int main()
@@ -38,8 +57,6 @@ int main()
     enqueue(queue, 2);
     enqueue(queue, 3);
     enqueue(queue, 4);
-
-    printf("Front item is %d\n", front(queue));
 
     printf("Front item is %d\n", front(queue));
 

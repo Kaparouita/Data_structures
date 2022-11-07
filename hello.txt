@@ -1,0 +1,12 @@
+p(A) = na vreksei
+p(B) = na pei oti tha vreksei
+
+P(A|B) = 0.9
+P(A|B') = 0.1
+
+xeimwna p(B)=0.7
+kalokairi p(b)=o.1
+
+P(B|A)= P(A|B)P(B)  / P(A)
+
+p(a)=p(A|B)p(B)+p(A|B')p(B)

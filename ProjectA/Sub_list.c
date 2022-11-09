@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pss.h"
-
-SubInfo *first_sub;
-Group GROUPS[MG];
+#include "SubAndInfo.h"
 
 /**
  * @brief check if list is empty
@@ -38,6 +36,7 @@ SubInfo *SubInfoConstractor(int ID, int TM, int *p_index, int p_size)
     int i = 0;
     newSub->sId = ID;
     newSub->stm = TM;
+    newSub->snext = NULL;
     /*INIT OLA ME 1*/
     for (i; i < MG; i++)
     {
@@ -57,8 +56,8 @@ SubInfo *SubInfoConstractor(int ID, int TM, int *p_index, int p_size)
  *
  * @param head_ref first sub
  * @param newSub   new sub
- * @return 1 if succeed
- *         else returns 0
+ * @return 0 if succeed
+ *         else returns 1
  */
 int Sub_Insert(SubInfo **head_ref, SubInfo *newSub)
 {
@@ -66,23 +65,26 @@ int Sub_Insert(SubInfo **head_ref, SubInfo *newSub)
 
     /*IF EMPTY*/
     if (isSubEmpty(*head_ref) || isSubEmpty(newSub))
-        return 0;
+        return 1;
     current = *head_ref;
     /*CHECK IF ITS THE FIRST ELEMENT*/
     if (newSub->stm < first_sub->stm)
     {
         newSub->snext = *head_ref;
         *head_ref = newSub;
-        return 1;
+        return 0;
     }
     while (current->snext != NULL && current->snext->stm < newSub->stm)
     {
         current = current->snext;
     }
+    /*ean yparxei*/
+    if (current->snext != NULL && current->snext->sId == newSub->sId)
+        return 1;
     newSub->snext = current->snext;
     current->snext = newSub;
 
-    return 1;
+    return 0;
 }
 
 /**
@@ -90,8 +92,8 @@ int Sub_Insert(SubInfo **head_ref, SubInfo *newSub)
  *
  * @param headref first sub
  * @param sub     sub to delete
- * @return 1 if succeed
- *         0 if fails
+ * @return 0 if succeed
+ *         1 if fails
  */
 int SL_delete(SubInfo **head, SubInfo *sub)
 {
@@ -101,14 +103,14 @@ int SL_delete(SubInfo **head, SubInfo *sub)
     prev = *head;
 
     if (isSubEmpty(*head) || isSubEmpty(sub))
-        return 0; /*fails if empty*/
+        return 1; /*fails if empty*/
 
     /*an einai to prwto stoixeio*/
     if (temp->sId == sub->sId)
     {
         *head = (*head)->snext;
         free(temp);
-        return 1;
+        return 0;
     }
     temp = temp->snext;
 
@@ -116,14 +118,14 @@ int SL_delete(SubInfo **head, SubInfo *sub)
     {
         if (temp->stm > sub->stm)
         {
-            return 0; /*didnt find the element*/
+            return 1; /*didnt find the element*/
         }
 
         if (temp->sId == sub->sId)
         {
             prev->snext = temp->snext;
             free(temp);
-            return 1;
+            return 0;
         }
         else
         {
@@ -131,7 +133,7 @@ int SL_delete(SubInfo **head, SubInfo *sub)
             temp = temp->snext;
         }
     }
-    return 0;
+    return 1;
 }
 /**
  * @brief Given the ID return the SubInfo owner of the ID
@@ -184,16 +186,7 @@ void print_sgp(SubInfo *Sub)
     }
     printf("\n\n");
 }
-
-int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr)
-{
-    SubInfo *new_sub = SubInfoConstractor(sId, sTM, gids_arr, size_of_gids_arr);
-    if (first_sub == NULL)
-        return 0;
-    Sub_Insert(&first_sub, new_sub);
-    return 1;
-}
-
+/*
 int main()
 {
     int a[6] = {31, 5, 6, 45, 1, -1};
@@ -201,16 +194,11 @@ int main()
     int c[6] = {63, 35, 6, 43, 1, -1};
 
     SubInfo *sub = SubInfoConstractor(4, 2000, a, 6);
-    first_sub = sub;
-    /*
-        SubInfo *sub3 = SubInfoConstractor(52, 1999, c);
-        SubInfo *sub1 = SubInfoConstractor(5, 4000, b);
-        SubInfo *sub2 = SubInfoConstractor(6, 2365, c);
-    */
 
     Subscriber_Registration(30, 10, b, 3);
-    Subscriber_Registration(40, 1, c, 6);
-    Subscriber_Registration(50, 2, a, 6);
+    Subscriber_Registration(32, 1, c, 6);
+    Subscriber_Registration(31, 2, a, 6);
+    Subscriber_Registration(31, 6, b, 6);
 
     printSubs(&first_sub);
 
@@ -219,3 +207,4 @@ int main()
 
     return 0;
 }
+*/

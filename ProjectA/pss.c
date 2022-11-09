@@ -17,6 +17,7 @@
 #include <stdlib.h>
 
 #include "pss.h"
+#include "SubAndInfo.h"
 
 SubInfo *first_sub;
 Group GROUPS[MG];
@@ -30,7 +31,16 @@ Group GROUPS[MG];
  */
 int initialize(void)
 {
-    return EXIT_SUCCESS;
+    /*init Groups*/
+    for (int i = 0; i < MG; i++)
+    {
+        G[i] = (Group *)malloc(sizeof(Group));
+        G[i]->gId = i;
+        G[i]->ggsub = NULL;
+        G[i]->gfirst = NULL;
+        G[i]->glast = NULL;
+    }
+    return 1;
 }
 
 /**
@@ -56,7 +66,15 @@ int free_all(void)
  */
 int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
 {
-    return EXIT_SUCCESS;
+    Info *new_info = InfoConstractor(iTM, iId, gids_arr, size_of_gids_arr);
+    if (first_info == NULL)
+    {
+        first_info = new_info;
+        return 0;
+    }
+    if (I_Insert(&first_info, new_info) == 0)
+        return 0;
+    return 1;
 }
 /**
  * @brief Subsriber Registration
@@ -70,8 +88,17 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
  */
 int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr)
 {
-    return EXIT_SUCCESS;
+    SubInfo *new_sub = SubInfoConstractor(sId, sTM, gids_arr, size_of_gids_arr);
+    if (first_sub == NULL)
+    {
+        first_sub = new_sub;
+        return 0;
+    }
+    if (Sub_Insert(&first_sub, new_sub) == 0)
+        return 0;
+    return 1;
 }
+
 /**
  * @brief Consume Information for subscriber
  *
@@ -92,7 +119,10 @@ int Consume(int sId)
  */
 int Delete_Subscriber(int sId)
 {
-    return EXIT_SUCCESS;
+    SubInfo *tmp = SL_LookUp(first_sub, sId);
+    if (SL_delete(&first_sub, tmp) == 0)
+        return 0;
+    return 1;
 }
 /**
  * @brief Print Data Structures of the system

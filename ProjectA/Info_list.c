@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "pss.h"
+#include "SubAndInfo.h"
 
 /*
 struct Info
@@ -13,11 +13,11 @@ struct Info
     struct Info *inext;
 };*/
 
-/* @brief check if list is empty
+/**
+ * @brief check if empty
  *
- * @param sub first sub
- * @return 0 if not empty
- *         1 otherwise
+ * @param info
+ * @return 0 if empty
  */
 int isInfoEmpty(Info *info)
 {
@@ -36,6 +36,8 @@ Info *InfoConstractor(int iTM, int iId, int *gp, int gp_size)
     int i = 0;
     newInfo->iId = iId;
     newInfo->itm = iTM;
+    newInfo->inext = NULL;
+    newInfo->iprev = NULL;
     /*INIT OLA ME 0*/
     for (i; i < MG; i++)
     {
@@ -50,20 +52,115 @@ Info *InfoConstractor(int iTM, int iId, int *gp, int gp_size)
     return newInfo;
 }
 
-int I_Insert(Info **last_info, Info *new_info)
+/**
+ * @brief given the last info and a new
+ *        add the new to the list
+ *
+ * @param last_info
+ * @param new_info
+ * @return int 1 if fails , 0 if succeed
+ */
+int I_Insert(Info **head_ref, Info *newInfo)
 {
-
-    if (isInfoEmpty(*last_info) || isInfoEmpty(new_info))
+    Info *curr;
+    /*IF EMPTY*/
+    if (isInfoEmpty(*head_ref) || isInfoEmpty(newInfo))
+        return 1;
+    curr = *head_ref;
+    /*CHECK IF ITS THE FIRST ELEMENT*/
+    if (newInfo->itm < curr->itm)
     {
+        newInfo->inext = curr;
+        curr->iprev = newInfo;
+        newInfo->iprev = NULL;
+        *head_ref = newInfo;
         return 0;
     }
-    *last_info->inext = new_info;
-    new_info->iprev = *last_info;
-    new_info->inext = NULL;
-    *last_info = new_info;
+    while (curr->inext != NULL && curr->inext->itm < newInfo->itm)
+    {
+        curr = curr->inext;
+    }
+    /*an den einai to teleuteo kai to itm yparxei hdh*/
+    if (curr->inext != NULL && curr->inext->itm == newInfo->itm)
+        return 1;
+    newInfo->inext = curr->inext;
+    newInfo->iprev = curr;
+    curr->inext = newInfo;
+    if (newInfo->inext != NULL)
+        newInfo->inext->iprev = newInfo;
+
+    return 0;
+}
+
+/**
+ * @brief delete an info from the list
+ *
+ * @param head
+ * @param sub
+ * @return returns 0 if succeed , 1 if fails
+ */
+int I_delete(Info **head, Info *sub)
+{
+    Info *temp;
+    temp = *head;
+
+    if (isInfoEmpty(*head) || isInfoEmpty(sub))
+        return 1; /*fails if empty*/
+    /*an einai to prwto stoixeio*/
+    if (temp->iId == sub->iId)
+    {
+        temp->inext->iprev = NULL;
+        *head = (*head)->inext;
+        free(temp);
+        return 0;
+    }
+    temp = temp->inext;
+    while (temp != NULL)
+    {
+        if (temp->itm > sub->itm)
+        {
+            return 1; /*didnt find the element*/
+        }
+
+        if (temp->iId == sub->iId)
+        {
+            temp->iprev->inext = temp->inext;
+            if (temp->inext != NULL)
+                temp->inext->iprev = temp->iprev;
+            free(temp);
+            return 0;
+        }
+        else
+        {
+            temp = temp->inext;
+        }
+    }
     return 1;
 }
 
+/**
+ * @brief look for a specific ID info
+ *
+ * @param head
+ * @param ID
+ * @return Info*
+ */
+Info *I_LookUp(Info *head, int ID)
+{
+    Info *curr;
+    curr = head;
+    if (isInfoEmpty(head))
+    {
+        return NULL;
+    }
+    while (curr != NULL)
+    {
+        if (curr->iId == ID)
+            return curr;
+        curr = curr->inext;
+    }
+    return NULL;
+}
 void printInfos(Info **sub)
 {
     Info *curr;
@@ -77,48 +174,52 @@ void printInfos(Info **sub)
 
     return;
 }
-/**
- * @brief Insert info
- *
- * @param iTM Timestamp of arrival
- * @param iId Identifier of information
- * @param gids_arr Pointer to array containing the gids of the Event.
- * @param size_of_gids_arr Size of gids_arr including -1
- * @return 0 on success
- *          1 on failure
- */
-int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
+void pprintInfos(Info **sub)
 {
-    return 1;
+    Info *curr;
+    curr = *sub;
+    while (curr != NULL)
+    {
+        printf(" %d ,", curr->iId);
+        curr = curr->iprev;
+    }
+    printf("\n\n");
+
+    return;
 }
 
+void printGroups()
+{
+
+    for (int i = 0; i < MG; i++)
+    {
+        printf("ID : %d , INFOS : ", G[i]->gId);
+        printInfos(&G[i]->gfirst);
+    }
+    printf("\n");
+
+    return;
+}
+
+/*
 int main()
 {
     int a[6] = {31, 5, 6, 45, 1, -1};
     int b[6] = {57, 35, 6, 43, 1, -1};
     int c[6] = {63, 35, 6, 43, 1, -1};
+    Info *first;
 
-    Group *g1 = malloc(sizeof(Group));
-    g1->gId = 1;
+    Insert_Info(2005, 4, a, 6);
+    Insert_Info(2001, 6, b, 6);
+    Insert_Info(2003, 7, c, 6);
+    Insert_Info(2000, 1, a, 6);
+    Insert_Info(1999, 10, a, 6);
 
-    Info *info1 = InfoConstractor(4, 2000, a, 6);
-    Info *info2 = InfoConstractor(5, 2001, b, 6);
-    Info *info3 = InfoConstractor(6, 2003, c, 6);
+    initialize();
 
-    g1->gfirst = info1;
-    g1->glast = info2;
+    // printGroups();
 
-    I_Insert(&info1, info2);
-    /*
-        SubInfo *sub3 = SubInfoConstractor(52, 1999, c);
-        SubInfo *sub1 = SubInfoConstractor(5, 4000, b);
-        SubInfo *sub2 = SubInfoConstractor(6, 2365, c);
-    */
-
-    printInfos(&g1->gfirst);
-
-    // print_sgp(sub4);
-    //  printSubs(&first_sub);
+    printInfos(&first_info);
 
     return 0;
-}
+}*/

@@ -50,6 +50,10 @@ struct SubInfo
     struct SubInfo *snext;
 };
 
+Info *first_info;
+SubInfo *first_sub; // first sub
+Group *G[MG];       // Groups
+
 /**
  * @brief Optional function to initialize data structures that
  *        need initialization

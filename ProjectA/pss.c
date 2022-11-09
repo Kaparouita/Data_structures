@@ -66,15 +66,21 @@ int free_all(void)
  */
 int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
 {
-    Info *new_info = InfoConstractor(iTM, iId, gids_arr, size_of_gids_arr);
-    if (first_info == NULL)
+    int i = size_of_gids_arr;
+    while (gids_arr != NULL && i != 0)
     {
-        first_info = new_info;
-        return 0;
+        /*create the info*/
+        Info *new_info = InfoConstractor(iTM, iId, gids_arr, size_of_gids_arr);
+        /*if its the first info of the group*/
+        if (G[*gids_arr]->gfirst == NULL)
+            G[*gids_arr]->gfirst = new_info;
+        /*else insert the info*/
+        else if (I_Insert(&G[*gids_arr]->gfirst, new_info) == 1)
+            return 1; /*if error return 1*/
+        gids_arr++;
+        i--;
     }
-    if (I_Insert(&first_info, new_info) == 0)
-        return 0;
-    return 1;
+    return 0;
 }
 /**
  * @brief Subsriber Registration
@@ -133,4 +139,50 @@ int Delete_Subscriber(int sId)
 int Print_all(void)
 {
     return EXIT_SUCCESS;
+}
+
+void print_igp(Info *info)
+{
+    if (isInfoEmpty(info) == 1)
+    {
+        printf("\n");
+        return;
+    }
+    for (int i = 0; i < MG; i++)
+    {
+        if (info->igp[i] == 1)
+            printf("MG:%d=%d ,", i, info->igp[i]);
+    }
+    printf("\n\n");
+}
+void printGroups()
+{
+
+    for (int i = 0; i < MG; i++)
+    {
+        printf("ID : %d , INFOS : ", G[i]->gId);
+        /*printInfos(&G[i]->gfirst);*/
+        print_igp(G[i]->gfirst);
+    }
+    printf("\n");
+
+    return;
+}
+
+int main()
+{
+    int a[6] = {31, 5, 60, 45, 1, -1};
+    int b[6] = {57, 35, 60, 43, 1, -1};
+    int c[6] = {63, 35, 60, 43, 1, -1};
+    int d[7] = {1, 1, 2, 3, 4, 45, -1};
+
+    initialize();
+    Insert_Info(2005, 4, d, 6);
+    Insert_Info(2005, 4, a, 5);
+    Insert_Info(2001, 6, b, 5);
+    Insert_Info(2003, 7, c, 5);
+
+    print_igp(G[57]->gfirst);
+
+    // printGroups();
 }

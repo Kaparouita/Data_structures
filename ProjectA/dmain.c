@@ -113,7 +113,7 @@ int main(int argc, char **argv)
             itm = event_args_arr[0];
             iId = event_args_arr[1];
             gids_arr = event_args_arr + 2;
-            num_of_gids -= 2;
+            num_of_gids -= 3; /*change apo -2*/
             if (Insert_Info(itm, iId, gids_arr, num_of_gids) == 0)
             {
                 DPRINT("%c <%d> <%d> DONE\n", buff[0], itm, iId);

@@ -50,7 +50,6 @@ struct SubInfo
     struct SubInfo *snext;
 };
 
-Info *first_info;
 SubInfo *first_sub; // first sub
 Group *G[MG];       // Groups
 

@@ -2,7 +2,8 @@
 #define SubAndInfo_h
 #include "pss.h"
 
-/*                  INFO LIST                   */
+/*------------------------------INFO_LIST-------------------------*/
+
 /**
  * @brief check if empty
  *
@@ -21,7 +22,7 @@ Info *InfoConstractor(int iTM, int iId, int *gp, int gp_size);
  * @param new_info
  * @return int 1 if fails , 0 if succeed
  */
-int I_Insert(Group *group, Info *newInfo);
+int I_Insert(Info **head_ref, Info *newInfo);
 
 /**
  * @brief delete an info from the list
@@ -43,7 +44,45 @@ Info *I_LookUp(Info *head, int ID);
 
 void printInfos(Info **sub);
 
-/*                    SUB  LIST                  */
+/*------------------------------SUBSCRIPTION-------------------------*/
+
+/**
+ * @brief checks if its empty
+ *
+ * @param sub
+ * @return return 0 if not null
+ */
+int S_isEmpty(Subscription *sub);
+/**
+ * @brief look for a sub with the id
+ *
+ * @param head
+ * @param id
+ * @return the subscription or NULL if not found
+ */
+Subscription *search(Subscription *head, int id);
+
+/**
+ * @brief insert a new subscription with the new_ID
+ *
+ * @param head
+ * @param new_ID
+ * @return return 0 if succeed
+ *         1 if fails
+ */
+int S_insert(Subscription **head, int new_ID);
+
+/**
+ * @brief Deletes a subscription
+ *
+ * @param head
+ * @param ID
+ * @return return 0 if succeed
+ *         1 if fails
+ */
+int S_delete(Subscription **head, int ID);
+
+/*------------------------------SUBLIST------------------------------*/
 
 int isSubEmpty(SubInfo *sub);
 /**

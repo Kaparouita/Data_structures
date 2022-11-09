@@ -64,6 +64,9 @@ Info *InfoConstractor(int iTM, int iId, int *gp, int gp_size)
 int I_Insert(Info **head_ref, Info *newInfo)
 {
     Info *curr;
+    /*EAN YPARXEI*/
+    if (I_LookUp(*head_ref, newInfo->iId) != NULL)
+        return 1;
     /*IF EMPTY*/
     if (isInfoEmpty(*head_ref) || isInfoEmpty(newInfo))
         return 1;
@@ -82,8 +85,6 @@ int I_Insert(Info **head_ref, Info *newInfo)
         curr = curr->inext;
     }
     /*an den einai to teleuteo kai to itm yparxei hdh*/
-    if (curr->inext != NULL && curr->inext->itm == newInfo->itm)
-        return 1;
     newInfo->inext = curr->inext;
     newInfo->iprev = curr;
     curr->inext = newInfo;
@@ -297,34 +298,33 @@ int main()
     int a[6] = {31, 5, 6, 45, 1, -1};
     int b[6] = {57, 35, 6, 43, 1, -1};
     int c[6] = {63, 35, 6, 43, 1, -1};
-    Info *first;
 
-    Insert_Info(2005, 4, a, 6);
+    Info *first;
+    // first = InfoConstractor(2, 4, a, 6);
+    initialize();
+    // I_Insert(&first, InfoConstractor(4, 5, b, 6));
     Insert_Info(2001, 6, b, 6);
     Insert_Info(2003, 7, c, 6);
     Insert_Info(2000, 1, a, 6);
     Insert_Info(1999, 10, a, 6);
 
-    initialize();
-
     // printGroups();
 
-    printInfos(&first_info);
+    // printInfos(&first);
 
+        Subscription *s1 = (Subscription *)malloc(sizeof(Subscription));
 
-    Subscription *s1 = (Subscription *)malloc(sizeof(Subscription));
+        s1->sId = 1;
 
-    s1->sId = 1;
+        S_insert(&s1, 3);
+        S_insert(&s1, 4);
+        S_insert(&s1, 5);
+        S_insert(&s1, 6);
 
-    S_insert(&s1, 3);
-    S_insert(&s1, 4);
-    S_insert(&s1, 5);
-    S_insert(&s1, 6);
+        printSubscriptions(&s1);
 
-    printSubscriptions(&s1);
+        S_delete(&s1, 6);
+        printSubscriptions(&s1);
 
-    S_delete(&s1, 6);
-    printSubscriptions(&s1);
-
-    return 0;
+        return 0;
 }*/

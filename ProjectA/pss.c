@@ -177,12 +177,12 @@ int main()
     int d[7] = {1, 1, 2, 3, 4, 45, -1};
 
     initialize();
-    Insert_Info(2005, 4, d, 6);
+    Insert_Info(2005, 3, d, 6);
     Insert_Info(2005, 4, a, 5);
     Insert_Info(2001, 6, b, 5);
     Insert_Info(2003, 7, c, 5);
 
-    print_igp(G[57]->gfirst);
+    printInfos(&G[1]->gfirst);
 
     // printGroups();
 }

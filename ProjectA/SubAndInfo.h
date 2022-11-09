@@ -38,7 +38,7 @@ int I_delete(Info **head, Info *sub);
  *
  * @param head
  * @param ID
- * @return Info*
+ * @return returns info
  */
 Info *I_LookUp(Info *head, int ID);
 

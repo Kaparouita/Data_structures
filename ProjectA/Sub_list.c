@@ -5,15 +5,6 @@
 SubInfo *first_sub;
 Group GROUPS[MG];
 
-/*
-struct SubInfo
-{
-    int sId;
-    int stm;
-    struct Info *sgp[MG];
-    struct SubInfo *snext;
-};*/
-
 /**
  * @brief check if list is empty
  *
@@ -21,7 +12,7 @@ struct SubInfo
  * @return 0 if not empty
  *         1 otherwise
  */
-int isEmpty(SubInfo *sub)
+int isSubEmpty(SubInfo *sub)
 {
     if (sub == NULL)
         return 1;
@@ -37,7 +28,7 @@ int isEmpty(SubInfo *sub)
  * @return SubInfo* if succed
  *         NULL if not
  */
-SubInfo *SubInfoConstractor(int ID, int TM, int *p_index)
+SubInfo *SubInfoConstractor(int ID, int TM, int *p_index, int p_size)
 {
     SubInfo *newSub = (SubInfo *)malloc(sizeof(SubInfo));
     if (p_index == NULL)
@@ -52,10 +43,11 @@ SubInfo *SubInfoConstractor(int ID, int TM, int *p_index)
     {
         newSub->sgp[i] = 1;
     }
-    while (*p_index != -1)
+    while (*p_index != -1 && p_size > 0)
     {
         /*INIT ME NULL GIA ARXH*/
         newSub->sgp[*p_index++] = NULL;
+        p_size--;
     }
     return newSub;
 }
@@ -73,7 +65,7 @@ int Sub_Insert(SubInfo **head_ref, SubInfo *newSub)
     SubInfo *current;
 
     /*IF EMPTY*/
-    if (isEmpty(*head_ref) || isEmpty(newSub))
+    if (isSubEmpty(*head_ref) || isSubEmpty(newSub))
         return 0;
     current = *head_ref;
     /*CHECK IF ITS THE FIRST ELEMENT*/
@@ -108,7 +100,7 @@ int SL_delete(SubInfo **head, SubInfo *sub)
     temp = *head;
     prev = *head;
 
-    if (isEmpty(*head) || isEmpty(sub))
+    if (isSubEmpty(*head) || isSubEmpty(sub))
         return 0; /*fails if empty*/
 
     /*an einai to prwto stoixeio*/
@@ -153,7 +145,7 @@ SubInfo *SL_LookUp(SubInfo *head, int ID)
 {
     SubInfo *curr;
     curr = head;
-    if (isEmpty(head))
+    if (isSubEmpty(head))
     {
         return NULL;
     }
@@ -195,7 +187,7 @@ void print_sgp(SubInfo *Sub)
 
 int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr)
 {
-    SubInfo *new_sub = SubInfoConstractor(sId, sTM, gids_arr);
+    SubInfo *new_sub = SubInfoConstractor(sId, sTM, gids_arr, size_of_gids_arr);
     if (first_sub == NULL)
         return 0;
     Sub_Insert(&first_sub, new_sub);
@@ -208,23 +200,20 @@ int main()
     int b[6] = {57, 35, 6, 43, 1, -1};
     int c[6] = {63, 35, 6, 43, 1, -1};
 
-    SubInfo *sub = SubInfoConstractor(4, 2000, a);
+    SubInfo *sub = SubInfoConstractor(4, 2000, a, 6);
     first_sub = sub;
+    /*
+        SubInfo *sub3 = SubInfoConstractor(52, 1999, c);
+        SubInfo *sub1 = SubInfoConstractor(5, 4000, b);
+        SubInfo *sub2 = SubInfoConstractor(6, 2365, c);
+    */
 
-    SubInfo *sub3 = SubInfoConstractor(52, 1999, c);
-    SubInfo *sub1 = SubInfoConstractor(5, 4000, b);
-    SubInfo *sub2 = SubInfoConstractor(6, 2365, c);
+    Subscriber_Registration(30, 10, b, 3);
+    Subscriber_Registration(40, 1, c, 6);
+    Subscriber_Registration(50, 2, a, 6);
 
-    // print_sgp(sub);
-    Sub_Insert(&first_sub, sub1);
-    Sub_Insert(&first_sub, sub2);
-    Sub_Insert(&first_sub, sub3);
-
-    // print_sgp(sub);
     printSubs(&first_sub);
-    SubInfo *sub4;
-    sub4 = SL_LookUp(first_sub, 6);
-    printf("sub4 : %d \n", sub4->sId);
+
     // print_sgp(sub4);
     //  printSubs(&first_sub);
 

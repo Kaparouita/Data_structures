@@ -19,8 +19,8 @@
 #include "pss.h"
 #include "SubAndInfo.h"
 
-SubInfo *first_sub;
-Group GROUPS[MG];
+void updateSubPointer(Subscription *Subscription, Info **info, int G_ID);
+int consume_print(SubInfo *sub, int gID);
 
 /**
  * @brief Optional function to initialize data structures that
@@ -66,21 +66,46 @@ int free_all(void)
  */
 int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
 {
+
     int i = size_of_gids_arr;
-    while (gids_arr != NULL && i != 0)
+    while (*gids_arr != -1 && i != 0)
     {
+        /*an einai ektos oriwn skipareto*/
+        if (*gids_arr < 0 || *gids_arr >= MG)
+        {
+            gids_arr++;
+            i--;
+            continue;
+        }
         /*create the info*/
         Info *new_info = InfoConstractor(iTM, iId, gids_arr, size_of_gids_arr);
         /*if its the first info of the group*/
         if (G[*gids_arr]->gfirst == NULL)
+        {
             G[*gids_arr]->gfirst = new_info;
+            updateSubPointer(G[*gids_arr]->ggsub, &(G[*gids_arr]->gfirst), *gids_arr);
+        }
         /*else insert the info*/
-        else if (I_Insert(&G[*gids_arr]->gfirst, new_info) == 1)
+        else if (I_Insert(&G[*gids_arr]->gfirst, new_info))
             return 1; /*if error return 1*/
+                      /*Print the Group info*/
+        printGroupInfo(G[*gids_arr]);
         gids_arr++;
         i--;
     }
     return 0;
+}
+
+void updateSubPointer(Subscription *Subscription, Info **info, int G_ID)
+{
+    while (Subscription != NULL)
+    {
+        /*find the sub via ID*/
+        SubInfo *curr_sub;
+        curr_sub = SL_LookUp(first_sub, Subscription->sId);
+        curr_sub->sgp[G_ID] = *info;
+        Subscription = Subscription->snext;
+    }
 }
 /**
  * @brief Subsriber Registration
@@ -94,17 +119,51 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
  */
 int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr)
 {
-    SubInfo *new_sub = SubInfoConstractor(sId, sTM, gids_arr, size_of_gids_arr);
+
+    int size = size_of_gids_arr;
+
+    /*ADD SUB TO SUBINFO*/
+    SubInfo *new_sub = SubInfoConstractor(sId, sTM, gids_arr, size);
+    /*an einai to prwto*/
     if (first_sub == NULL)
     {
         first_sub = new_sub;
-        return 0;
     }
-    if (Sub_Insert(&first_sub, new_sub) == 0)
-        return 0;
-    return 1;
-}
+    else if (Sub_Insert(&first_sub, new_sub))
+        return 1;
+    printSubs(&first_sub); /*print subs*/
 
+    /*UPDATE SUBSCRIPTION LIST*/
+    int i = size_of_gids_arr;
+    while (*gids_arr != -1 && size != 0)
+    {
+
+        /*an einai ektos oriwn skipareto*/
+        if (*gids_arr < 0 || *gids_arr >= MG)
+        {
+            gids_arr++;
+            i--;
+            continue;
+        }
+        /*EAN EINAI TO PRWTO*/
+        if (G[*gids_arr]->ggsub == NULL)
+        {
+
+            Subscription *subscription = (Subscription *)malloc(sizeof(Subscription));
+            subscription->sId = sId;
+            subscription->snext = NULL;
+            G[*gids_arr]->ggsub = subscription;
+        }
+        else
+            S_insert(&G[*gids_arr]->ggsub, sId);
+        /*Print the Group subscription*/
+        printGroupSubs(G[*gids_arr]);
+        gids_arr++;
+        size--;
+    }
+
+    return 0;
+}
 /**
  * @brief Consume Information for subscriber
  *
@@ -114,7 +173,52 @@ int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_ar
  */
 int Consume(int sId)
 {
-    return EXIT_SUCCESS;
+    int i = 0;
+    SubInfo *sub;
+    sub = SL_LookUp(first_sub, sId);
+    /*an den yparxei to sub*/
+    if (isSubEmpty(sub))
+    {
+        return 1;
+    }
+    for (i; i < MG; i++)
+    {
+        if (sub->sgp[i] != 1)
+        {
+            consume_print(sub, i);
+        }
+    }
+    return 0;
+}
+/**
+ * @brief helping fuction for consume
+ *
+ * @param sub
+ * @param gID
+ */
+int consume_print(SubInfo *sub, int gID)
+{
+    printf("   GROUPID = <%d>,", gID);
+    printf("INFOLIST = <");
+    Info *curr_info = sub->sgp[gID], *prev = curr_info;
+    /*Ean deixnei se NULL(To group den exei info)*/
+    if (curr_info == NULL)
+    {
+        printf("%p>,", curr_info);
+        printf("NEWSGP = <");
+        printf("%p>\n", curr_info);
+        return 0;
+    }
+    while (curr_info != NULL)
+    {
+        prev = curr_info;
+        printf(" %d ,", curr_info->iId);
+        curr_info = curr_info->inext;
+    }
+    printf(">,NEWSGP = <");
+    sub->sgp[gID] = prev;
+    printf("%d>\n", sub->sgp[gID]->iId);
+    return 0;
 }
 /**
  * @brief Delete subscriber
@@ -125,10 +229,24 @@ int Consume(int sId)
  */
 int Delete_Subscriber(int sId)
 {
+    int i;
     SubInfo *tmp = SL_LookUp(first_sub, sId);
-    if (SL_delete(&first_sub, tmp) == 0)
-        return 0;
-    return 1;
+    if (tmp == NULL)
+        return 1;
+    if (SL_delete(&first_sub, tmp))
+        return 1;
+    printSubs(&first_sub);
+    printf("\n");
+    for (i = 0; i < MG; i++)
+    {
+        Subscription *s = search(G[i]->ggsub, sId);
+        if (s != NULL)
+        {
+            S_delete(&G[i]->ggsub, sId);
+            printGroupSubs(G[i]);
+        }
+    }
+    return 0;
 }
 /**
  * @brief Print Data Structures of the system
@@ -138,7 +256,15 @@ int Delete_Subscriber(int sId)
  */
 int Print_all(void)
 {
-    return EXIT_SUCCESS;
+    int i;
+
+    printGroups();
+    printf("\n");
+    printSubs(&first_sub);
+    printf("\n");
+    printAllSubs(&first_sub);
+
+    return 0;
 }
 
 void print_igp(Info *info)
@@ -155,34 +281,56 @@ void print_igp(Info *info)
     }
     printf("\n\n");
 }
+
 void printGroups()
 {
-
-    for (int i = 0; i < MG; i++)
+    int i;
+    for (i = 0; i < MG; i++)
     {
-        printf("ID : %d , INFOS : ", G[i]->gId);
-        /*printInfos(&G[i]->gfirst);*/
-        print_igp(G[i]->gfirst);
+        printf("   GROUPID :  <%d>, INFOLIST : ", G[i]->gId);
+        printInfos(&G[i]->gfirst);
+        printf(",SUBLIST : ");
+        printSubscriptions(&G[i]->ggsub);
     }
+}
+void printGroupInfo(Group group[])
+{
+    printf("   GROUPID :  <%d> , INFOLIST : ", group->gId);
+    printInfos(&group->gfirst);
+    /*print_igp(G[i]->gfirst);*/
     printf("\n");
 
     return;
 }
+void printGroupSubs(Group group[])
+{
+    printf("   GROUPID :  <%d> , SUBLIST : ", group->gId);
+    printSubscriptions(&group->ggsub);
+    return;
+}
 
+/*
 int main()
 {
     int a[6] = {31, 5, 60, 45, 1, -1};
     int b[6] = {57, 35, 60, 43, 1, -1};
     int c[6] = {63, 35, 60, 43, 1, -1};
-    int d[7] = {1, 1, 2, 3, 4, 45, -1};
+    int d[7] = {1, 8, 2, 3, 4, 45, -1};
 
     initialize();
-    Insert_Info(2005, 3, d, 6);
-    Insert_Info(2005, 4, a, 5);
-    Insert_Info(2001, 6, b, 5);
-    Insert_Info(2003, 7, c, 5);
+    Subscriber_Registration(2005, 3, d, 6);
+    Subscriber_Registration(2004, 4, a, 5);
+    Subscriber_Registration(2003, 3, d, 6);
+    Subscriber_Registration(2001, 6, b, 5);
 
-    printInfos(&G[1]->gfirst);
+    // Insert_Info(2005, 3, d, 6);
+    //  Insert_Info(2005, 4, a, 5);
+    //   Insert_Info(2001, 6, b, 5);
+    //   Insert_Info(2003, 7, c, 5);
+
+    // printInfos(&G[1]->gfirst);
+    // printGroup(G[60]);
 
     // printGroups();
 }
+*/

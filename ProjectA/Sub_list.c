@@ -3,6 +3,7 @@
 #include "pss.h"
 #include "SubAndInfo.h"
 
+void print_sgp(SubInfo *Sub);
 /**
  * @brief check if list is empty
  *
@@ -42,13 +43,32 @@ SubInfo *SubInfoConstractor(int ID, int TM, int *p_index, int p_size)
     {
         newSub->sgp[i] = 1;
     }
-    while (*p_index != -1 && p_size > 0)
+    SubSgpINIT(newSub, p_index, p_size);
+    return newSub;
+}
+/**
+ * @brief
+ *
+ * @param sub
+ * @param p_sgp
+ * @param p_size
+ * @return int
+ */
+int SubSgpINIT(SubInfo *sub, int *p_sgp, int p_size)
+{
+    while (*p_sgp != -1 && p_size > 0)
     {
+        if (*p_sgp < 0 || *p_sgp >= MG)
+        {
+            *p_sgp++;
+            p_size--;
+            continue;
+        }
         /*INIT ME NULL GIA ARXH*/
-        newSub->sgp[*p_index++] = NULL;
+        sub->sgp[*p_sgp] = G[*p_sgp]->gfirst;
+        *p_sgp++;
         p_size--;
     }
-    return newSub;
 }
 
 /**
@@ -80,7 +100,7 @@ int Sub_Insert(SubInfo **head_ref, SubInfo *newSub)
     }
     /*ean yparxei*/
     if (current->snext != NULL && current->snext->sId == newSub->sId)
-        return 1;
+        return 0;
     newSub->snext = current->snext;
     current->snext = newSub;
 
@@ -164,7 +184,7 @@ SubInfo *SL_LookUp(SubInfo *head, int ID)
  *
  * @param sub first sub
  */
-void printSubs(SubInfo **sub)
+void printSubsInfo(SubInfo **sub)
 {
     SubInfo *curr;
     curr = *sub;
@@ -178,13 +198,57 @@ void printSubs(SubInfo **sub)
     return;
 }
 
+void printSubs(SubInfo **sub)
+{
+    SubInfo *curr;
+    curr = *sub;
+    printf("   SUBSCRIBERELIST = <");
+    while (curr != NULL)
+    {
+        if (curr->snext == NULL)
+            printf(" %d ", curr->sId);
+        else
+            printf(" %d ,", curr->sId);
+        curr = curr->snext;
+    }
+    printf(">\n");
+
+    return;
+}
+
+/*PRINT ALL SUBS*/
+void printAllSubs(SubInfo **sub)
+{
+    SubInfo *curr;
+    curr = *sub;
+    while (curr != NULL)
+    {
+        printf("   SUBSCRIBERERID = <%d> ,", curr->sId);
+        print_sgp(curr);
+        printf("\n");
+        curr = curr->snext;
+    }
+    printf(">\n");
+
+    return;
+}
+
+/**
+ * @brief print Grouplist of a sub
+ *
+ * @param Sub
+ */
 void print_sgp(SubInfo *Sub)
 {
+    printf("GROUPLIST = <");
     for (int i = 0; i < MG; i++)
     {
-        printf("MG : %d  =  %p\n", i, Sub->sgp[i]);
+        if (Sub->sgp[i] != 1)
+        {
+            printf(" %d ,", i);
+        }
     }
-    printf("\n\n");
+    printf(">");
 }
 /*
 int main()

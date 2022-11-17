@@ -17,7 +17,6 @@
 #else /* DEBUG */
 #define DPRINT(...)
 #endif /* DEBUG */
-
 /**
  * @brief Parsing event arguments from buffer
  *

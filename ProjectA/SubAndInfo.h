@@ -8,7 +8,7 @@
  * @brief check if empty
  *
  * @param info
- * @return int
+ * @return return 1 if empty
  */
 int isInfoEmpty(Info *info);
 

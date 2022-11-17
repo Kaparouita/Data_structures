@@ -52,7 +52,6 @@ struct SubInfo
 
 SubInfo *first_sub; // first sub
 Group *G[MG];       // Groups
-
 /**
  * @brief Optional function to initialize data structures that
  *        need initialization
@@ -119,5 +118,11 @@ int Delete_Subscriber(int sId);
  *          1 on failure
  */
 int Print_all(void);
+
+void printGroupInfo(Group group[]);
+void printGroupSubs(Group group[]);
+void printSubscriptions(Subscription **sub);
+void printAllSubs(SubInfo **sub);
+int SubSgpINIT(SubInfo *sub, int *p_sgp, int p_size);
 
 #endif /* pss_h */

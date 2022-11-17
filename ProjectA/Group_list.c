@@ -17,7 +17,7 @@ struct Info
  * @brief check if empty
  *
  * @param info
- * @return 0 if empty
+ * @return 1 if empty
  */
 int isInfoEmpty(Info *info)
 {
@@ -46,7 +46,8 @@ Info *InfoConstractor(int iTM, int iId, int *gp, int gp_size)
     while (*gp != -1 && gp_size > 0)
     {
         /*INIT ME 1 AN SYSXETIZETE ME THN OMADA i*/
-        newInfo->igp[*gp] = 1;
+        if (*gp >= 0 && *gp < MG)
+            newInfo->igp[*gp] = 1;
         gp++;
         gp_size--;
     }
@@ -66,7 +67,7 @@ int I_Insert(Info **head_ref, Info *newInfo)
     Info *curr;
     /*EAN YPARXEI*/
     if (I_LookUp(*head_ref, newInfo->iId) != NULL)
-        return 1;
+        return 0;
     /*IF EMPTY*/
     if (isInfoEmpty(*head_ref) || isInfoEmpty(newInfo))
         return 1;
@@ -167,12 +168,17 @@ void printInfos(Info **sub)
 {
     Info *curr;
     curr = *sub;
+    printf("<");
     while (curr != NULL)
     {
-        printf(" %d ,", curr->iId);
+        /*gia na mhn exei extra komma*/
+        if (curr->inext)
+            printf(" %d ,", curr->iId);
+        else
+            printf(" %d ", curr->iId);
         curr = curr->inext;
     }
-    printf("\n\n");
+    printf(">");
 
     return;
 }
@@ -283,15 +289,19 @@ void printSubscriptions(Subscription **sub)
 {
     Subscription *curr;
     curr = *sub;
+    printf("<");
     while (curr != NULL)
     {
-        printf(" %d ,", curr->sId);
+        if (curr->snext == NULL)
+            printf(" %d ", curr->sId);
+        else
+            printf(" %d ,", curr->sId);
         curr = curr->snext;
     }
-    printf("\n\n");
-
+    printf(">\n");
     return;
 }
+
 /*
 int main()
 {
@@ -299,32 +309,27 @@ int main()
     int b[6] = {57, 35, 6, 43, 1, -1};
     int c[6] = {63, 35, 6, 43, 1, -1};
 
-    Info *first;
     // first = InfoConstractor(2, 4, a, 6);
     initialize();
-    // I_Insert(&first, InfoConstractor(4, 5, b, 6));
-    Insert_Info(2001, 6, b, 6);
-    Insert_Info(2003, 7, c, 6);
-    Insert_Info(2000, 1, a, 6);
-    Insert_Info(1999, 10, a, 6);
 
     // printGroups();
 
     // printInfos(&first);
 
-        Subscription *s1 = (Subscription *)malloc(sizeof(Subscription));
+    Subscription *s1 = (Subscription *)malloc(sizeof(Subscription));
 
-        s1->sId = 1;
+    s1->sId = 1;
 
-        S_insert(&s1, 3);
-        S_insert(&s1, 4);
-        S_insert(&s1, 5);
-        S_insert(&s1, 6);
+    S_insert(&s1, 3);
+    S_insert(&s1, 4);
+    S_insert(&s1, 5);
+    S_insert(&s1, 6);
 
-        printSubscriptions(&s1);
+    printSubscriptions(&s1);
 
-        S_delete(&s1, 6);
-        printSubscriptions(&s1);
+    S_delete(&s1, 6);
+    printSubscriptions(&s1);
 
-        return 0;
-}*/
+    return 0;
+}
+*/

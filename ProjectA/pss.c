@@ -31,8 +31,9 @@ int consume_print(SubInfo *sub, int gID);
  */
 int initialize(void)
 {
+    int i;
     /*init Groups*/
-    for (int i = 0; i < MG; i++)
+    for (i = 0; i < MG; i++)
     {
         G[i] = (Group *)malloc(sizeof(Group));
         G[i]->gId = i;
@@ -83,6 +84,7 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
         if (G[*gids_arr]->gfirst == NULL)
         {
             G[*gids_arr]->gfirst = new_info;
+            /*UPDATE IT*/
             updateSubPointer(G[*gids_arr]->ggsub, &(G[*gids_arr]->gfirst), *gids_arr);
         }
         /*else insert the info*/
@@ -96,6 +98,13 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
     return 0;
 }
 
+/**
+ * @brief if its the first insert change NULL pointer to first of group
+ *
+ * @param Subscription
+ * @param info
+ * @param G_ID
+ */
 void updateSubPointer(Subscription *Subscription, Info **info, int G_ID)
 {
     while (Subscription != NULL)
@@ -178,15 +187,13 @@ int Consume(int sId)
     sub = SL_LookUp(first_sub, sId);
     /*an den yparxei to sub*/
     if (isSubEmpty(sub))
-    {
         return 1;
-    }
+
     for (i; i < MG; i++)
     {
-        if (sub->sgp[i] != 1)
-        {
+        /*an den einai ==1 kane consume*/
+        if (sub->sgp[i] != (Info *)1)
             consume_print(sub, i);
-        }
     }
     return 0;
 }
@@ -211,11 +218,12 @@ int consume_print(SubInfo *sub, int gID)
     }
     while (curr_info != NULL)
     {
-        prev = curr_info;
+        prev = curr_info; /*keep prev pointer*/
         printf(" %d ,", curr_info->iId);
         curr_info = curr_info->inext;
     }
     printf(">,NEWSGP = <");
+    /*update sgp pointer*/
     sub->sgp[gID] = prev;
     printf("%d>\n", sub->sgp[gID]->iId);
     return 0;
@@ -233,8 +241,10 @@ int Delete_Subscriber(int sId)
     SubInfo *tmp = SL_LookUp(first_sub, sId);
     if (tmp == NULL)
         return 1;
+    /*delete the sub*/
     if (SL_delete(&first_sub, tmp))
         return 1;
+    /*print if succed*/
     printSubs(&first_sub);
     printf("\n");
     for (i = 0; i < MG; i++)
@@ -242,7 +252,9 @@ int Delete_Subscriber(int sId)
         Subscription *s = search(G[i]->ggsub, sId);
         if (s != NULL)
         {
+            /*delete from each group if the sub had subscribe*/
             S_delete(&G[i]->ggsub, sId);
+            /*print the result after delete*/
             printGroupSubs(G[i]);
         }
     }
@@ -267,14 +279,21 @@ int Print_all(void)
     return 0;
 }
 
+/**
+ * @brief print igp given info
+ *
+ * @param info
+ */
 void print_igp(Info *info)
 {
+    int i;
+    /*ean einai empty*/
     if (isInfoEmpty(info) == 1)
     {
         printf("\n");
         return;
     }
-    for (int i = 0; i < MG; i++)
+    for (i = 0; i < MG; i++)
     {
         if (info->igp[i] == 1)
             printf("MG:%d=%d ,", i, info->igp[i]);
@@ -282,6 +301,11 @@ void print_igp(Info *info)
     printf("\n\n");
 }
 
+/**
+ * @brief Print Groups | Infolist
+ * from 0-MG
+ *
+ */
 void printGroups()
 {
     int i;
@@ -293,6 +317,11 @@ void printGroups()
         printSubscriptions(&G[i]->ggsub);
     }
 }
+/**
+ * @brief print Group | infolist given the group
+ *
+ * @param group
+ */
 void printGroupInfo(Group group[])
 {
     printf("   GROUPID :  <%d> , INFOLIST : ", group->gId);
@@ -302,6 +331,12 @@ void printGroupInfo(Group group[])
 
     return;
 }
+/**
+ * @brief print Group | Sublist
+ * given a group
+ *
+ * @param group
+ */
 void printGroupSubs(Group group[])
 {
     printf("   GROUPID :  <%d> , SUBLIST : ", group->gId);

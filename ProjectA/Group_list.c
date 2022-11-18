@@ -3,16 +3,6 @@
 #include "pss.h"
 #include "SubAndInfo.h"
 
-/*
-struct Info
-{
-    int iId;
-    int itm;
-    int igp[MG];
-    struct Info *iprev;
-    struct Info *inext;
-};*/
-
 /**
  * @brief check if empty
  *
@@ -26,6 +16,15 @@ int isInfoEmpty(Info *info)
     return 0;
 }
 
+/**
+ * @brief Create an info given its attributes
+ *
+ * @param iTM
+ * @param iId
+ * @param gp
+ * @param gp_size
+ * @return Info*
+ */
 Info *InfoConstractor(int iTM, int iId, int *gp, int gp_size)
 {
     Info *newInfo = (Info *)malloc(sizeof(Info));
@@ -55,10 +54,10 @@ Info *InfoConstractor(int iTM, int iId, int *gp, int gp_size)
 }
 
 /**
- * @brief given the last info and a new
+ * @brief given the head info and a new
  *        add the new to the list
  *
- * @param last_info
+ * @param head_ref
  * @param new_info
  * @return int 1 if fails , 0 if succeed
  */
@@ -82,9 +81,8 @@ int I_Insert(Info **head_ref, Info *newInfo)
         return 0;
     }
     while (curr->inext != NULL && curr->inext->itm < newInfo->itm)
-    {
         curr = curr->inext;
-    }
+
     /*an den einai to teleuteo kai to itm yparxei hdh*/
     newInfo->inext = curr->inext;
     newInfo->iprev = curr;
@@ -121,12 +119,11 @@ int I_delete(Info **head, Info *sub)
     while (temp != NULL)
     {
         if (temp->itm > sub->itm)
-        {
             return 1; /*didnt find the element*/
-        }
 
-        if (temp->iId == sub->iId)
+        else if (temp->iId == sub->iId)
         {
+            /*delete*/
             temp->iprev->inext = temp->inext;
             if (temp->inext != NULL)
                 temp->inext->iprev = temp->iprev;
@@ -134,9 +131,7 @@ int I_delete(Info **head, Info *sub)
             return 0;
         }
         else
-        {
             temp = temp->inext;
-        }
     }
     return 1;
 }
@@ -159,15 +154,20 @@ Info *I_LookUp(Info *head, int ID)
     while (curr != NULL)
     {
         if (curr->iId == ID)
-            return curr;
+            return curr; /*return if found*/
         curr = curr->inext;
     }
     return NULL;
 }
-void printInfos(Info **sub)
+/**
+ * @brief print id enws info list
+ *
+ * @param info
+ */
+void printInfos(Info **info)
 {
     Info *curr;
-    curr = *sub;
+    curr = *info;
     printf("<");
     while (curr != NULL)
     {
@@ -179,19 +179,6 @@ void printInfos(Info **sub)
         curr = curr->inext;
     }
     printf(">");
-
-    return;
-}
-void pprintInfos(Info **sub)
-{
-    Info *curr;
-    curr = *sub;
-    while (curr != NULL)
-    {
-        printf(" %d ,", curr->iId);
-        curr = curr->iprev;
-    }
-    printf("\n\n");
 
     return;
 }
@@ -233,7 +220,7 @@ int S_insert(Subscription **head, int new_ID)
 }
 
 /**
- * @brief
+ * @brief find a subscription with id=id else return NULL
  *
  * @param head
  * @param id
@@ -251,6 +238,14 @@ Subscription *search(Subscription *head, int id)
     return NULL;
 }
 
+/**
+ * @brief Given the head of a list delete the subscription with ID
+ *
+ * @param head
+ * @param ID
+ * @return return 1 if fails
+ *         return 0 if succeed
+ */
 int S_delete(Subscription **head, int ID)
 {
     Subscription *temp;
@@ -268,8 +263,10 @@ int S_delete(Subscription **head, int ID)
         return 0;
     }
     temp = temp->snext;
+    /*find it*/
     while (temp != NULL)
     {
+        /*delete*/
         if (temp->sId == ID)
         {
             prev->snext = temp->snext;
@@ -285,6 +282,11 @@ int S_delete(Subscription **head, int ID)
     return 1;
 }
 
+/**
+ * @brief given the head of a list print ids of the subs
+ *
+ * @param sub
+ */
 void printSubscriptions(Subscription **sub)
 {
     Subscription *curr;

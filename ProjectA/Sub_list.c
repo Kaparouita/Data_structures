@@ -4,6 +4,7 @@
 #include "SubAndInfo.h"
 
 void print_sgp(SubInfo *Sub);
+int is_MG_limits(int id);
 /**
  * @brief check if list is empty
  *
@@ -29,48 +30,56 @@ int isSubEmpty(SubInfo *sub)
  */
 SubInfo *SubInfoConstractor(int ID, int TM, int *p_index, int p_size)
 {
+    int i = 0;
     SubInfo *newSub = (SubInfo *)malloc(sizeof(SubInfo));
     if (p_index == NULL)
     {
         return NULL;
     }
-    int i = 0;
     newSub->sId = ID;
     newSub->stm = TM;
     newSub->snext = NULL;
-    /*INIT OLA ME 1*/
-    for (i; i < MG; i++)
-    {
-        newSub->sgp[i] = 1;
-    }
     SubSgpINIT(newSub, p_index, p_size);
     return newSub;
 }
 /**
- * @brief
+ * @brief init the sgp of a sub
  *
  * @param sub
  * @param p_sgp
  * @param p_size
- * @return int
  */
-int SubSgpINIT(SubInfo *sub, int *p_sgp, int p_size)
+void SubSgpINIT(SubInfo *sub, int *p_sgp, int p_size)
 {
+    int i = 0;
+    /*INIT OLA ME 1*/
+    for (i = 0; i < MG; i++)
+    {
+        sub->sgp[i] = (Info *)1;
+    }
     while (*p_sgp != -1 && p_size > 0)
     {
-        if (*p_sgp < 0 || *p_sgp >= MG)
-        {
-            *p_sgp++;
-            p_size--;
-            continue;
-        }
-        /*INIT ME NULL GIA ARXH*/
-        sub->sgp[*p_sgp] = G[*p_sgp]->gfirst;
+        /*if out of limits skip*/
+        if (!is_MG_limits(*p_sgp))
+            sub->sgp[*p_sgp] = G[*p_sgp]->gfirst;
+
         *p_sgp++;
         p_size--;
     }
 }
 
+/**
+ * @brief check if the id is between 0-MG
+ *
+ * @param id
+ * @return return 0 if true ,else 1
+ */
+int is_MG_limits(int id)
+{
+    if (id < 0 || id >= MG)
+        return 1;
+    return 0;
+}
 /**
  * @brief Instert a new sub to the list
  *
@@ -137,11 +146,9 @@ int SL_delete(SubInfo **head, SubInfo *sub)
     while (temp != NULL)
     {
         if (temp->stm > sub->stm)
-        {
             return 1; /*didnt find the element*/
-        }
 
-        if (temp->sId == sub->sId)
+        else if (temp->sId == sub->sId)
         {
             prev->snext = temp->snext;
             free(temp);
@@ -198,6 +205,11 @@ void printSubsInfo(SubInfo **sub)
     return;
 }
 
+/**
+ * @brief Print Subscriberlist ids
+ *
+ * @param sub
+ */
 void printSubs(SubInfo **sub)
 {
     SubInfo *curr;
@@ -216,7 +228,11 @@ void printSubs(SubInfo **sub)
     return;
 }
 
-/*PRINT ALL SUBS*/
+/**
+ * @brief Print all sub list given head (first_sub)
+ *
+ * @param sub
+ */
 void printAllSubs(SubInfo **sub)
 {
     SubInfo *curr;
@@ -240,10 +256,11 @@ void printAllSubs(SubInfo **sub)
  */
 void print_sgp(SubInfo *Sub)
 {
+    int i;
     printf("GROUPLIST = <");
-    for (int i = 0; i < MG; i++)
+    for (i = 0; i < MG; i++)
     {
-        if (Sub->sgp[i] != 1)
+        if (Sub->sgp[i] != (Info *)1)
         {
             printf(" %d ,", i);
         }

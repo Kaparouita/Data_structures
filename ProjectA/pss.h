@@ -50,8 +50,8 @@ struct SubInfo
     struct SubInfo *snext;
 };
 
-SubInfo *first_sub; // first sub
-Group *G[MG];       // Groups
+SubInfo *first_sub; /*first sub*/
+Group *G[MG];       /* Groups*/
 /**
  * @brief Optional function to initialize data structures that
  *        need initialization
@@ -123,6 +123,6 @@ void printGroupInfo(Group group[]);
 void printGroupSubs(Group group[]);
 void printSubscriptions(Subscription **sub);
 void printAllSubs(SubInfo **sub);
-int SubSgpINIT(SubInfo *sub, int *p_sgp, int p_size);
+void SubSgpINIT(SubInfo *sub, int *p_sgp, int p_size);
 
 #endif /* pss_h */

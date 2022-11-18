@@ -17,7 +17,6 @@
 #include <stdlib.h>
 
 #include "pss.h"
-#include "SubAndInfo.h"
 
 void updateSubPointer(Subscription *Subscription, Info **info, int G_ID);
 int consume_print(SubInfo *sub, int gID);
@@ -31,6 +30,7 @@ int consume_print(SubInfo *sub, int gID);
  */
 int initialize(void)
 {
+<<<<<<< HEAD
     int i;
     /*init Groups*/
     for (i = 0; i < MG; i++)
@@ -42,6 +42,9 @@ int initialize(void)
         G[i]->glast = NULL;
     }
     return 1;
+=======
+    return EXIT_SUCCESS;
+>>>>>>> c375b1d0cb72dfdee1e6d35d734c92ecc9bb7735
 }
 
 /**
@@ -67,6 +70,7 @@ int free_all(void)
  */
 int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
 {
+<<<<<<< HEAD
 
     int i = size_of_gids_arr;
     while (*gids_arr != -1 && i != 0)
@@ -96,6 +100,9 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
         i--;
     }
     return 0;
+=======
+    return EXIT_SUCCESS;
+>>>>>>> c375b1d0cb72dfdee1e6d35d734c92ecc9bb7735
 }
 
 /**
@@ -128,6 +135,7 @@ void updateSubPointer(Subscription *Subscription, Info **info, int G_ID)
  */
 int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr)
 {
+<<<<<<< HEAD
 
     int size = size_of_gids_arr;
 
@@ -172,6 +180,9 @@ int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_ar
     }
 
     return 0;
+=======
+    return EXIT_SUCCESS;
+>>>>>>> c375b1d0cb72dfdee1e6d35d734c92ecc9bb7735
 }
 /**
  * @brief Consume Information for subscriber
@@ -237,6 +248,7 @@ int consume_print(SubInfo *sub, int gID)
  */
 int Delete_Subscriber(int sId)
 {
+<<<<<<< HEAD
     int i;
     SubInfo *tmp = SL_LookUp(first_sub, sId);
     if (tmp == NULL)
@@ -259,6 +271,9 @@ int Delete_Subscriber(int sId)
         }
     }
     return 0;
+=======
+    return EXIT_SUCCESS;
+>>>>>>> c375b1d0cb72dfdee1e6d35d734c92ecc9bb7735
 }
 /**
  * @brief Print Data Structures of the system
@@ -278,6 +293,7 @@ int Print_all(void)
 
     return 0;
 }
+<<<<<<< HEAD
 
 /**
  * @brief print igp given info
@@ -369,3 +385,5 @@ int main()
     // printGroups();
 }
 */
+=======
+>>>>>>> c375b1d0cb72dfdee1e6d35d734c92ecc9bb7735

@@ -82,13 +82,16 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
         if (G[*gids_arr]->gfirst == NULL)
         {
             G[*gids_arr]->gfirst = new_info;
+            G[*gids_arr]->glast = new_info;
             /*UPDATE IT*/
             updateSubPointer(G[*gids_arr]->ggsub, &(G[*gids_arr]->gfirst), *gids_arr);
         }
         /*else insert the info*/
         else if (I_Insert(&G[*gids_arr]->gfirst, new_info))
             return 1; /*if error return 1*/
-                      /*Print the Group info*/
+        if (new_info->itm >= G[*gids_arr]->glast->itm)
+            G[*gids_arr]->glast = new_info;
+        /*Print the Group info*/
         printGroupInfo(G[*gids_arr]);
         gids_arr++;
         i--;
@@ -205,7 +208,7 @@ int consume_print(SubInfo *sub, int gID)
 {
     printf("   GROUPID = <%d>,", gID);
     printf("INFOLIST = <");
-    Info *curr_info = sub->sgp[gID], *prev = curr_info;
+    Info *curr_info = sub->sgp[gID];
     /*Ean deixnei se NULL(To group den exei info)*/
     if (curr_info == NULL)
     {
@@ -216,13 +219,13 @@ int consume_print(SubInfo *sub, int gID)
     }
     while (curr_info != NULL)
     {
-        prev = curr_info; /*keep prev pointer*/
         printf(" %d ,", curr_info->iId);
         curr_info = curr_info->inext;
     }
     printf(">,NEWSGP = <");
     /*update sgp pointer*/
-    sub->sgp[gID] = prev;
+    /*sub->sgp[gID] = prev;*/
+    sub->sgp[gID] = G[gID]->glast;
     printf("%d>\n", sub->sgp[gID]->iId);
     return 0;
 }
@@ -909,3 +912,23 @@ void printSubscriptions(Subscription **sub)
     printf(">\n");
     return;
 }
+/*
+int main()
+{
+    int a[6] = {31, 5, 60, 45, 1, -1};
+    int b[6] = {57, 35, 60, 43, 1, -1};
+    int c[6] = {63, 35, 60, 43, 1, -1};
+    int d[7] = {1, 8, 2, 3, 4, 45, -1};
+
+    initialize();
+    Insert_Info(2000, 1, a, 6);
+    Insert_Info(2001, 2, b, 6);
+    Insert_Info(2000, 3, c, 6);
+
+    printf("FINISHED INSERT\n\n");
+    if (G[60]->glast != NULL)
+        printf("LAST : %d", G[60]->glast->iId);
+    else
+        printf("null\n");
+}
+*/

@@ -121,6 +121,7 @@ int Delete_Subscriber(int sId);
  */
 int Print_all(void);
 
+/*=====================MYFUCTIONS==================*/
 /**
  * @brief print Group | infolist given the group
  *
@@ -290,9 +291,19 @@ SubInfo *SL_LookUp(SubInfo *head, int ID);
  *
  * @param sub first sub
  */
+
+/*====================EXTRA PRINTS====================*/
 void printSubs(SubInfo **sub);
 void print_sgp(SubInfo *Sub);
 
 void printGroups();
+
+int consume_print(SubInfo *sub, int gID);
+
+/*=====================FREE================*/
+
+int FreeInfos(Info *head);
+int freeSubs();
+int freeGroups();
 
 #endif /* pss_h */

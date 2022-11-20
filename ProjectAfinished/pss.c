@@ -39,6 +39,8 @@ int initialize(void)
         G[i]->gfirst = NULL;
         G[i]->glast = NULL;
     }
+    /*init subs*/
+    first_sub = NULL;
     return 1;
 }
 
@@ -50,7 +52,9 @@ int initialize(void)
  */
 int free_all(void)
 {
-    return EXIT_SUCCESS;
+    if (freeGroups())
+        return 1;
+    return 0;
 }
 
 /**
@@ -709,15 +713,16 @@ int I_Insert(Info **head_ref, Info *newInfo)
  * @param sub
  * @return returns 0 if succeed , 1 if fails
  */
-int I_delete(Info **head, Info *sub)
+int I_delete(Info **head, Info *info)
 {
+    int i = 0;
     Info *temp;
     temp = *head;
 
-    if (isInfoEmpty(*head) || isInfoEmpty(sub))
+    if (isInfoEmpty(*head) || isInfoEmpty(info))
         return 1; /*fails if empty*/
     /*an einai to prwto stoixeio*/
-    if (temp->iId == sub->iId)
+    if (temp->iId == info->iId)
     {
         temp->inext->iprev = NULL;
         *head = (*head)->inext;
@@ -727,10 +732,10 @@ int I_delete(Info **head, Info *sub)
     temp = temp->inext;
     while (temp != NULL)
     {
-        if (temp->itm > sub->itm)
+        if (temp->itm > info->itm)
             return 1; /*didnt find the element*/
 
-        else if (temp->iId == sub->iId)
+        else if (temp->iId == info->iId)
         {
             /*delete*/
             temp->iprev->inext = temp->inext;
@@ -912,6 +917,48 @@ void printSubscriptions(Subscription **sub)
     printf(">\n");
     return;
 }
+/*============================FREE=============================*/
+
+int freeSubs()
+{
+    SubInfo *curr, *next = first_sub;
+    if (isSubEmpty(curr))
+        return 1;
+    while (next != NULL)
+    {
+        curr = next;
+        next = next->snext;
+        free(curr);
+    }
+    return 0;
+}
+int FreeInfos(Info *head)
+{
+    int i = 0;
+    Info *curr = head;
+    if (isInfoEmpty(head))
+        return 1;
+    while (head != NULL)
+    {
+        curr = head;
+        head = head->inext;
+        free(curr);
+    }
+    return 0;
+}
+int freeGroups()
+{
+    int i = 0;
+    for (i; i < MG; i++)
+    {
+        Info *test = G[i]->gfirst;
+        if (FreeInfos(G[i]->gfirst))
+            return 1;
+        free(G[i]);
+    }
+    return 0;
+}
+
 /*
 int main()
 {

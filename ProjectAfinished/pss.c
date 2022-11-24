@@ -18,6 +18,9 @@
 
 #include "pss.h"
 
+SubInfo *first_sub; /*first sub*/
+Group *G[MG];       /* Groups*/
+
 void updateSubPointer(Subscription *Subscription, Info **info, int G_ID);
 
 /**
@@ -52,8 +55,9 @@ int initialize(void)
  */
 int free_all(void)
 {
-    if (freeGroups())
+    if (freeGroups() || freeSubs())
         return 1;
+    printf("FREE ALL SUCCESS");
     return 0;
 }
 
@@ -922,7 +926,7 @@ void printSubscriptions(Subscription **sub)
 int freeSubs()
 {
     SubInfo *curr, *next = first_sub;
-    if (isSubEmpty(curr))
+    if (isSubEmpty(first_sub))
         return 1;
     while (next != NULL)
     {
@@ -952,8 +956,7 @@ int freeGroups()
     for (i; i < MG; i++)
     {
         Info *test = G[i]->gfirst;
-        if (FreeInfos(G[i]->gfirst))
-            return 1;
+        FreeInfos(G[i]->gfirst);
         free(G[i]);
     }
     return 0;

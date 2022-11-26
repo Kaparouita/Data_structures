@@ -89,6 +89,16 @@ int DepthEqualHeight(Node *cur_root, Node *root)
     }
     return DepthEqualHeight(cur_root->left, root) || DepthEqualHeight(cur_root->right, root);
 }
+
+void printtree(Node *root){
+    
+    Node *right=root->right;
+    Node *left=root->left;
+    printf(root->val);
+    while(right!=NULL||left!=NULL){
+
+    }
+}
 int main()
 {
     root = (Node *)malloc(sizeof(Node));

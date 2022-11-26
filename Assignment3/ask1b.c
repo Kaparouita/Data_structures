@@ -77,6 +77,24 @@ treenode *tranformTree(Node *R)
     }
     return node;
 }
+
+//ask2b
+void treenodeRight(treenode *root){
+  int i=0;
+  if(root==NULL)
+     return;
+   i=root->k-1;
+   while(i>=0){
+      printf("%d ,",root->children[i]->val);
+      i--;
+   }  
+   i=root->k-1;
+   while(i>=0){
+     treenodeRight(root->children[i]);
+     i--;
+   } 
+   
+}
 int main()
 {
     root = (Node *)malloc(sizeof(Node));
@@ -88,11 +106,10 @@ int main()
     root->left->right->left->left = nodeConstr(8);
     root->left->right->left->left->right = nodeConstr(9);
     root->left->right->left->left->left = nodeConstr(10);
-
     root->left->left->right = nodeConstr(5);
     root->left->left->right->left = nodeConstr(11);
     // Visit(root);
     // tranform(root);
     treenode *a = tranformTree(root);
-    printf("%d", a->children[0]->children[1]->children[0]->val);
+    treenodeRight(a);
 }

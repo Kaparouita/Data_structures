@@ -35,13 +35,13 @@ treenode *tranform(Node *root)
         return NULL;
     treenode *new_node = (treenode *)malloc(sizeof(treenode));
     new_node->val = root->val;
+    new_node->k = root.k;
     new_node->k = 0;
     // child
     Node *P = root->left;
     while (P != NULL)
     {
         treenode *new_child = (treenode *)malloc(sizeof(treenode));
-        new_child->k = 0;
         new_child->val = P->val;
 
         // Add the child

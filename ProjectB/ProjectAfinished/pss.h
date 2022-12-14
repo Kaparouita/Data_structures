@@ -2,8 +2,8 @@
  *
  * file: pss.h
  *
- * @Author  Nikolaos Vasilikopoulos (nvasilik@csd.uoc.gr)
- * @Version 20-10-2020
+ * @Authors  Nikolaos Vasilikopoulos (nvasilik@csd.uoc.gr), John Petropoulos (johnpetr@csd.uoc.gr)
+ * @Version 30-11-2022
  *
  * @e-mail       hy240-list@csd.uoc.gr
  *
@@ -17,10 +17,10 @@
 #define pss_h
 #define MG 64
 
-/*typedef structs*/
-typedef struct Subscription Subscription;
-typedef struct SubInfo SubInfo;
 typedef struct Info Info;
+typedef struct SubInfo SubInfo;
+typedef struct TreeInfo TreeInfo;
+typedef struct Subscription Subscription;
 typedef struct Group Group;
 
 struct Info
@@ -40,26 +40,40 @@ struct Subscription
 struct Group
 {
     int gId;
-    struct Subscription *ggsub;
-    struct Info *gfirst;
-    struct Info *glast;
+    struct Subscription *gsub;
+    struct Info *gr;
 };
 struct SubInfo
 {
     int sId;
     int stm;
-    struct Info *sgp[MG];
+    struct TreeInfo *tgp[MG];
+    struct TreeInfo *sgp[MG];
     struct SubInfo *snext;
 };
+struct TreeInfo
+{
+    int tId;
+    int ttm;
+    struct TreeInfo *tlc;
+    struct TreeInfo *trc;
+    struct TreeInfo *tp;
+    struct TreeInfo *next;
+};
 
+SubInfo *first_sub; /*first sub*/
+Group *G[MG];       /* Groups*/
 /**
  * @brief Optional function to initialize data structures that
  *        need initialization
  *
+ * @param m Size of hash table
+ * @param p Prime number for the universal hash function
+ *
  * @return 0 on success
  *         1 on failure
  */
-int initialize(void);
+int initialize(int m, int p);
 
 /**
  * @brief Free resources
@@ -92,6 +106,15 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr);
  *          1 on failure
  */
 int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr);
+
+/**
+ * @brief Prune Information from server and forward it to client
+ *
+ * @param tm Information timestamp of arrival
+ * @return 0 on success
+ *          1 on failure
+ */
+int Prune(int tm);
 
 /**
  * @brief Consume Information for subscriber

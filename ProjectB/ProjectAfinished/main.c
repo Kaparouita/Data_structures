@@ -2,8 +2,8 @@
  *
  * file: main.c
  *
- * @Author  Nikolaos Vasilikopoulos (nvasilik@csd.uoc.gr)
- * @Version 25-10-2022
+ * @Authors  Nikolaos Vasilikopoulos (nvasilik@csd.uoc.gr), John Petropoulos (johnpetr@csd.uoc.gr)
+ * @Version 30-11-2022
  *
  * @e-mail       hy240-list@csd.uoc.gr
  *
@@ -17,6 +17,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <ctype.h>
 
 #include "pss.h"
 
@@ -70,6 +71,7 @@ static int *event_args(char *buff, unsigned int *int_arr_size)
 
 	return int_arr;
 }
+
 /**
  * @brief The main function
  *
@@ -85,22 +87,40 @@ int main(int argc, char **argv)
 	char buff[BUFFER_SIZE], event = '\0';
 
 	/* Check command buff arguments */
-	if (argc != 2)
+	if (argc != 4)
 	{
-		fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
+		fprintf(stderr, "Usage: %s <m> <p> <input_file>\n", argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	/* Parse command buff arguments */
+	int hashTableSize = atoi(argv[1]);
+	int universalHashingNumber = atoi(argv[2]);
+
+	if (hashTableSize <= 0)
+	{
+		fprintf(stderr, "\n Invalid hash table size: %d\n", hashTableSize);
+		perror("Parsing command line argument\n");
+		return EXIT_FAILURE;
+	}
+
+	if (universalHashingNumber <= 0)
+	{
+		fprintf(stderr, "\n Invalid universal hashing number: %d\n", universalHashingNumber);
+		perror("Parsing command line argument\n");
 		return EXIT_FAILURE;
 	}
 
 	/* Open input file */
-	if ((fin = fopen(argv[1], "r")) == NULL)
+	if ((fin = fopen(argv[3], "r")) == NULL)
 	{
-		fprintf(stderr, "\n Could not open file: %s\n", argv[1]);
+		fprintf(stderr, "\n Could not open file: %s\n", argv[3]);
 		perror("Opening test file\n");
 		return EXIT_FAILURE;
 	}
 
 	/* Initializations */
-	initialize();
+	initialize(hashTableSize, universalHashingNumber);
 
 	/* Read input file buff-by-buff and handle the events */
 	while (fgets(buff, BUFFER_SIZE, fin))
@@ -126,7 +146,7 @@ int main(int argc, char **argv)
 			itm = event_args_arr[0];
 			iId = event_args_arr[1];
 			gids_arr = event_args_arr + 2;
-			num_of_gids -= 3; /*change apo -2*/
+			num_of_gids -= 2;
 			if (Insert_Info(itm, iId, gids_arr, num_of_gids) == 0)
 			{
 				DPRINT("%c <%d> <%d> DONE\n", buff[0], itm, iId);
@@ -163,6 +183,23 @@ int main(int argc, char **argv)
 			}
 			num_of_gids = 0;
 			free(event_args_arr);
+			break;
+		}
+
+		/* Prune
+		 * R <tm> */
+		case 'R':
+		{
+			int tm;
+			sscanf(buff, "%c %d", &event, &tm);
+			if (Prune(tm) == 0)
+			{
+				DPRINT("%c <%d> DONE\n", event, tm);
+			}
+			else
+			{
+				fprintf(stderr, "%c %d failed\n", event, tm);
+			}
 			break;
 		}
 

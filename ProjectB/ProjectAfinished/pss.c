@@ -18,6 +18,7 @@
 
 #include "pss.h"
 
+
 SubInfo *first_sub; /*first sub*/
 Group *G[MG];       /* Groups*/
 
@@ -189,7 +190,36 @@ int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_ar
  */
 int Prune(int tm)
 {
+    int i=0;
+    for(i=0;i<MG;i++){
+        Info *info = getInfoForPrune(G[i]->gr,tm);
+        if(info!=NULL)
+          printf("%d",info->itm);
+        while(info!=NULL){
+           info = getInfoForPrune(G[i]->gr,tm);
+           //SubTgpUpdate(i,info);
+           if(info!=NULL)
+           BST_delete(G[i]->gr,BST_search(G[i]->gr,info->iId));
+        }
+        printf("hi");
+        
+    }
     return EXIT_SUCCESS;
+}
+Info *getInfoForPrune(Info *root,int key){
+    if (root == NULL || root->itm <= key)
+        return root;
+    if (root->itm < key)
+        return getInfoForPrune(root->ilc, key);
+    return getInfoForPrune(root->irc, key);
+}
+void SubTgpUpdate(int gId,Info *info){
+    Subscription *subscription=G[gId]->gsub;
+    while(subscription!=NULL){
+        SubInfo *sub = SL_LookUp(first_sub,G[gId]->gsub->sId);
+        Insert_TI(sub->tgp[gId],TreeInfoConstractor(info->itm,info->itm),NULL);
+        subscription=subscription->snext;
+    }
 }
 /**
  * @brief Consume Information for subscriber
@@ -332,9 +362,9 @@ void printGroups()
     int i;
     for (i = 0; i < MG; i++)
     {
-        printf("   GROUPID :  <%d>, INFOLIST : ", G[i]->gId);
-        // printInfos(&G[i]->gfirst);
-        printf(",SUBLIST : ");
+        printf("   GROUPID :  <%d>, INFOLIST : <", G[i]->gId);
+        printInorder(G[i]->gr);
+        printf(">,SUBLIST : ");
         printSubscriptions(&G[i]->gsub);
     }
 }
@@ -348,7 +378,7 @@ void printGroupInfo(Group group[])
     printf("   GROUPID :  <%d> , INFOLIST : < ", group->gId);
     // printInfos(&group->gfirst);
     printInorder(group->gr);
-    /*print_igp(G[i]->gfirst);*/
+    //print_igp(G[i]->gr);
     printf(">\n");
 
     return;

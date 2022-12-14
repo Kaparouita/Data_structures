@@ -119,6 +119,7 @@ void pl(TreeInfo *root)
         root = root->next;
     }
 }
+/*
 int main()
 {
     TreeInfo *a = TreeInfoConstractor(1, 20);
@@ -140,4 +141,4 @@ int main()
     pl(GetListRoot(first));
 
     printf("\n%d\n", LookUp_IT(first, 4)->ttm);
-}
+}*/

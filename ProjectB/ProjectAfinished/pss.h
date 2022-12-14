@@ -61,8 +61,6 @@ struct TreeInfo
     struct TreeInfo *next;
 };
 
-SubInfo *first_sub; /*first sub*/
-Group *G[MG];       /* Groups*/
 /**
  * @brief Optional function to initialize data structures that
  *        need initialization
@@ -332,5 +330,9 @@ Info *BST_search(Info *root, int key);
 int *BST_delete(Info *root, Info *del);
 void printBST(Info *root);
 void printInorder(Info *node);
+TreeInfo *Insert_TI(TreeInfo *root, TreeInfo *new, TreeInfo *parent);
+TreeInfo *TreeInfoConstractor(int tId, int ttm);
+Info *getInfoForPrune(Info *root,int tm);
+void SubTgpUpdate(int gId,Info *info);
 
 #endif /* pss_h */

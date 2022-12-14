@@ -22,7 +22,7 @@ Info *InfoConstractor(int iTM, int iId, int *gp, int gp_size)
         return NULL;
     }
     int i = 0;
-    newInfo->iId = iId;
+    newInfo->itm = iId;
     newInfo->itm = iTM;
     newInfo->ilc = NULL;
     newInfo->irc = NULL;
@@ -55,19 +55,19 @@ Info *BST_insert(Info *root, Info *new_info)
     /*keep the parent*/
     new_info->ip = root;
     /*an einai megalytero deksia*/
-    if (root->iId > new_info->iId)
+    if (root->itm > new_info->itm)
         root->ilc = BST_insert(root->ilc, new_info);
     /*mikrotero aristera*/
-    else if (root->iId < new_info->iId)
+    else if (root->itm < new_info->itm)
         root->irc = BST_insert(root->irc, new_info);
     return root;
 }
 
 Info *BST_search(Info *root, int key)
 {
-    if (root == NULL || root->iId == key)
+    if (root == NULL || root->itm == key)
         return root;
-    if (root->iId > key)
+    if (root->itm > key)
         return BST_search(root->ilc, key);
     return BST_search(root->irc, key);
 }
@@ -153,7 +153,7 @@ void BST_copy(Info *info, Info *copy)
     {
         info->igp[i] = copy->igp[i];
     }
-    info->iId = copy->iId;
+    info->itm = copy->itm;
     info->itm = copy->itm;
 }
 
@@ -161,13 +161,13 @@ void printBST(Info *root)
 {
     if (root != NULL)
     {
-        printf("%d ", root->iId);
+        printf("%d ", root->itm);
         if (root->ilc != NULL)
-            printf("-> (l:%d) ", root->ilc->iId);
+            printf("-> (l:%d) ", root->ilc->itm);
         if (root->irc != NULL)
-            printf("-> (r:%d) ", root->irc->iId);
+            printf("-> (r:%d) ", root->irc->itm);
         if (root->ip != NULL)
-            printf("-> (p:%d) ", root->ip->iId);
+            printf("-> (p:%d) ", root->ip->itm);
         printf("\n");
 
         printBST(root->ilc);
@@ -184,7 +184,7 @@ void printInorder(Info *node)
     printInorder(node->ilc);
 
     /* then print the data of node */
-    printf("%d , ", node->iId);
+    printf("%d , ", node->itm);
 
     /* now recur on right child */
     printInorder(node->irc);

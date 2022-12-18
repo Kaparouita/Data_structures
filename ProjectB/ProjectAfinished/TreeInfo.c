@@ -22,8 +22,7 @@ TreeInfo *Insert_TI(TreeInfo *root, TreeInfo *new, TreeInfo *parent)
         /*Otan einai mikrotero */
         if (parent->ttm > new->ttm)
         {
-            printf("parent :%d\n", parent->ttm);
-            TreeInfo *dummy = TreeInfoConstractor(new->ttm, new->ttm);
+            TreeInfo *dummy = TreeInfoConstractor(new->tId, new->ttm);
 
             /*update childs*/
             new->tlc = dummy;
@@ -48,7 +47,7 @@ TreeInfo *Insert_TI(TreeInfo *root, TreeInfo *new, TreeInfo *parent)
         }
         else if (parent->ttm < new->ttm)
         {
-            TreeInfo *dummy = TreeInfoConstractor(parent->ttm, parent->ttm);
+            TreeInfo *dummy = TreeInfoConstractor(parent->tId, parent->ttm);
             /*update childs*/
             dummy->tlc = parent;
             dummy->trc = new;
@@ -104,6 +103,23 @@ void printTree(TreeInfo *root)
     }
 }
 
+void printTreeID(TreeInfo *root)
+{
+    if (root != NULL)
+    {
+        printf("%d ", root->tId);
+        if (root->tlc != NULL)
+            printf("-> (l:%d) ", root->tlc->tId);
+        if (root->trc != NULL)
+            printf("-> (r:%d) ", root->trc->tId);
+        if (root->tp != NULL)
+            printf("-> (p:%d) ", root->tp->tId);
+        printf("\n");
+
+        printTreeID(root->tlc);
+        printTreeID(root->trc);
+    }
+}
 TreeInfo *GetListRoot(TreeInfo *root)
 {
     while (root->tlc != NULL)

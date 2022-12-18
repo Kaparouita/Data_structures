@@ -18,7 +18,6 @@
 
 #include "pss.h"
 
-
 SubInfo *first_sub; /*first sub*/
 Group *G[MG];       /* Groups*/
 
@@ -190,35 +189,46 @@ int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_ar
  */
 int Prune(int tm)
 {
-    int i=0;
-    for(i=0;i<MG;i++){
-        Info *info = getInfoForPrune(G[i]->gr,tm);
-        if(info!=NULL)
-          printf("%d",info->itm);
-        while(info!=NULL){
-           info = getInfoForPrune(G[i]->gr,tm);
-           //SubTgpUpdate(i,info);
-           if(info!=NULL)
-           BST_delete(G[i]->gr,BST_search(G[i]->gr,info->iId));
+    int i = 1;
+    for (i = 0; i < MG; i++)
+    {
+        Info *info = getInfoForPrune(G[i]->gr, tm);
+
+        while (info != NULL)
+        {
+            info = getInfoForPrune(G[i]->gr, tm);
+            if (info != NULL)
+            {
+                SubTgpUpdate(i, info);
+                G[i]->gr = BST_delete(G[i]->gr, info);
+            }
         }
-        printf("hi");
-        
     }
     return EXIT_SUCCESS;
 }
-Info *getInfoForPrune(Info *root,int key){
+Info *getInfoForPrune(Info *root, int key)
+{
     if (root == NULL || root->itm <= key)
         return root;
-    if (root->itm < key)
-        return getInfoForPrune(root->ilc, key);
-    return getInfoForPrune(root->irc, key);
+    root = getInfoForPrune(root->ilc, key);
+    return root;
 }
-void SubTgpUpdate(int gId,Info *info){
-    Subscription *subscription=G[gId]->gsub;
-    while(subscription!=NULL){
-        SubInfo *sub = SL_LookUp(first_sub,G[gId]->gsub->sId);
-        Insert_TI(sub->tgp[gId],TreeInfoConstractor(info->itm,info->itm),NULL);
-        subscription=subscription->snext;
+void SubTgpUpdate(int gId, Info *info)
+{
+    Subscription *subscription = G[gId]->gsub;
+
+    // printf("AAAAA   %d   %d   %d\n", info->itm, gId, sub->sId);
+    while (subscription != NULL)
+    {
+        SubInfo *sub = SL_LookUp(first_sub, subscription->sId);
+        /*an einai to prwto*/
+        if (sub->tgp[gId] == (TreeInfo *)1 || sub->tgp[gId] == NULL)
+            sub->tgp[gId] = TreeInfoConstractor(info->iId, info->itm);
+        else if (sub->tgp[gId]->tlc == NULL)
+            sub->tgp[gId] = Insert_TI(sub->tgp[gId], TreeInfoConstractor(info->iId, info->itm), NULL);
+        else
+            Insert_TI(sub->tgp[gId], TreeInfoConstractor(info->iId, info->itm), NULL);
+        subscription = subscription->snext;
     }
 }
 /**
@@ -310,6 +320,7 @@ int Delete_Subscriber(int sId)
     }
     return 0;
 }
+void printSubsTgpInfo(SubInfo **sub);
 /**
  * @brief Print Data Structures of the system
  *
@@ -326,6 +337,7 @@ int Print_all(void)
     printf("\n");
     i = printAllSubs(&first_sub);
     printf("   NO_GROUPS = <%d> ,NO_SUBSCRIBERS <%d>\n", MG, i);
+    printSubsTgpInfo(&first_sub);
 
     return 0;
 }
@@ -378,7 +390,7 @@ void printGroupInfo(Group group[])
     printf("   GROUPID :  <%d> , INFOLIST : < ", group->gId);
     // printInfos(&group->gfirst);
     printInorder(group->gr);
-    //print_igp(G[i]->gr);
+    // print_igp(G[i]->gr);
     printf(">\n");
 
     return;
@@ -596,6 +608,27 @@ void printSubsInfo(SubInfo **sub)
     while (curr != NULL)
     {
         printf(" %d ,", curr->sId);
+        curr = curr->snext;
+    }
+    printf("\n\n");
+
+    return;
+}
+
+void printSubsTgpInfo(SubInfo **sub)
+{
+    int i = 0;
+    SubInfo *curr;
+    curr = *sub;
+    while (curr != NULL)
+    {
+        for (i = 0; i < MG; i++)
+        {
+            if (curr->tgp[i] != (TreeInfo *)1)
+                printTreeID(curr->tgp[i]);
+            // printf("\n", curr->sId);
+        }
+        printf("SUB %d\n-------------------\n", curr->sId);
         curr = curr->snext;
     }
     printf("\n\n");

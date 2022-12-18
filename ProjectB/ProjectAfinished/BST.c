@@ -22,7 +22,7 @@ Info *InfoConstractor(int iTM, int iId, int *gp, int gp_size)
         return NULL;
     }
     int i = 0;
-    newInfo->itm = iId;
+    newInfo->iId = iId;
     newInfo->itm = iTM;
     newInfo->ilc = NULL;
     newInfo->irc = NULL;
@@ -55,19 +55,19 @@ Info *BST_insert(Info *root, Info *new_info)
     /*keep the parent*/
     new_info->ip = root;
     /*an einai megalytero deksia*/
-    if (root->itm > new_info->itm)
+    if (root->iId > new_info->iId)
         root->ilc = BST_insert(root->ilc, new_info);
     /*mikrotero aristera*/
-    else if (root->itm < new_info->itm)
+    else if (root->iId < new_info->iId)
         root->irc = BST_insert(root->irc, new_info);
     return root;
 }
 
 Info *BST_search(Info *root, int key)
 {
-    if (root == NULL || root->itm == key)
+    if (root == NULL || root->iId == key)
         return root;
-    if (root->itm > key)
+    if (root->iId > key)
         return BST_search(root->ilc, key);
     return BST_search(root->irc, key);
 }
@@ -83,7 +83,7 @@ Info *minValueNode(Info *node)
     return current;
 }
 
-int *BST_delete(Info *root, Info *del)
+Info *BST_delete(Info *root, Info *del)
 {
     Info *child, *tmp_p;
     /*AN EINAI FYLLO*/
@@ -101,7 +101,6 @@ int *BST_delete(Info *root, Info *del)
         else
             root = NULL;
         free(del);
-        return 0;
     }
     /*AN EXEI ENA PAIDI*/
     else if (del->ilc == NULL || del->irc == NULL)
@@ -137,6 +136,7 @@ int *BST_delete(Info *root, Info *del)
         BST_delete(root, child);
         BST_copy(del, tmp_p);
     }
+    return root;
 }
 
 /**
@@ -153,7 +153,7 @@ void BST_copy(Info *info, Info *copy)
     {
         info->igp[i] = copy->igp[i];
     }
-    info->itm = copy->itm;
+    info->iId = copy->iId;
     info->itm = copy->itm;
 }
 
@@ -161,13 +161,13 @@ void printBST(Info *root)
 {
     if (root != NULL)
     {
-        printf("%d ", root->itm);
+        printf("%d ", root->iId);
         if (root->ilc != NULL)
-            printf("-> (l:%d) ", root->ilc->itm);
+            printf("-> (l:%d) ", root->ilc->iId);
         if (root->irc != NULL)
-            printf("-> (r:%d) ", root->irc->itm);
+            printf("-> (r:%d) ", root->irc->iId);
         if (root->ip != NULL)
-            printf("-> (p:%d) ", root->ip->itm);
+            printf("-> (p:%d) ", root->ip->iId);
         printf("\n");
 
         printBST(root->ilc);
@@ -184,13 +184,14 @@ void printInorder(Info *node)
     printInorder(node->ilc);
 
     /* then print the data of node */
-    printf("%d , ", node->itm);
+    printf("%d , ", node->iId);
 
     /* now recur on right child */
     printInorder(node->irc);
 }
 
-/*int main()
+/*
+int main()
 {
     int a[6] = {31, 5, 6, 45, 1, -1};
     int b[6] = {57, 35, 6, 43, 1, -1};
@@ -207,7 +208,7 @@ void printInorder(Info *node)
 
     printBST(first);
 
-    BST_delete(first, BST_search(first, 8));
+    first = BST_delete(first, BST_search(first, 10));
     printf("-----------\n");
     printBST(first);
     // printf("\n%d", copy->iId);

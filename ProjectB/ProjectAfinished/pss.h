@@ -327,12 +327,14 @@ int freeGroups();
 
 Info *BST_insert(Info *root, Info *new_info);
 Info *BST_search(Info *root, int key);
-int *BST_delete(Info *root, Info *del);
+Info *BST_delete(Info *root, Info *del);
 void printBST(Info *root);
 void printInorder(Info *node);
 TreeInfo *Insert_TI(TreeInfo *root, TreeInfo *new, TreeInfo *parent);
 TreeInfo *TreeInfoConstractor(int tId, int ttm);
-Info *getInfoForPrune(Info *root,int tm);
-void SubTgpUpdate(int gId,Info *info);
+void printTree(TreeInfo *root);
+void printTreeID(TreeInfo *root);
+Info *getInfoForPrune(Info *root, int tm);
+void SubTgpUpdate(int gId, Info *info);
 
 #endif /* pss_h */

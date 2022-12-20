@@ -30,7 +30,7 @@ void updateSubPointer(Subscription *Subscription, Info **info, int G_ID);
  * @return 0 on success
  *         1 on failure
  */
-int initialize(int m, int p)
+int initialize(int m, int p, SymTable_S **table)
 {
     int i;
     /*init Groups*/
@@ -42,7 +42,7 @@ int initialize(int m, int p)
         G[i]->gr = NULL;
     }
     /*init subs*/
-    first_sub = NULL;
+    *table = SymTable_new(m, p);
     return 1;
 }
 
@@ -88,11 +88,7 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
         Info *new_info = InfoConstractor(iTM, iId, gids_arr, size_of_gids_arr);
         /*if its the first info of the group*/
         if (G[*gids_arr]->gr == NULL)
-        {
             G[*gids_arr]->gr = new_info;
-            /*UPDATE IT*/
-            updateSubPointer(G[*gids_arr]->gsub, &(G[*gids_arr]->gr), *gids_arr);
-        }
         /*else insert the info*/
         else
             BST_insert(G[*gids_arr]->gr, new_info);
@@ -104,24 +100,18 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr)
     return 0;
 }
 
-/**
- * @brief if its the first insert change NULL pointer to first of group
- *
- * @param Subscription
- * @param info
- * @param G_ID
- */
+/*
 void updateSubPointer(Subscription *Subscription, Info **info, int G_ID)
 {
     while (Subscription != NULL)
     {
-        /*find the sub via ID*/
+
         SubInfo *curr_sub;
         curr_sub = SL_LookUp(first_sub, Subscription->sId);
         curr_sub->sgp[G_ID] = *info;
         Subscription = Subscription->snext;
     }
-}
+}*/
 /**
  * @brief Subsriber Registration
  *
@@ -132,38 +122,31 @@ void updateSubPointer(Subscription *Subscription, Info **info, int G_ID)
  * @return 0 on success
  *          1 on failure
  */
-int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr)
+int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr, SymTable_S *table)
 {
 
     int size = size_of_gids_arr;
 
     /*ADD SUB TO SUBINFO*/
     SubInfo *new_sub = SubInfoConstractor(sId, sTM, gids_arr, size);
-    /*an einai to prwto*/
-    if (first_sub == NULL)
-    {
-        first_sub = new_sub;
-    }
-    else if (Sub_Insert(&first_sub, new_sub))
-        return 1;
-    printSubs(&first_sub); /*print subs*/
+
+    SymTable_insert(table, new_sub);
+    /*-------------------------CHANGE THE PRINT CAUSE TABLE-----------------------------------*/
+    printSubs(table); /*print subs*/
 
     /*UPDATE SUBSCRIPTION LIST*/
-    int i = size_of_gids_arr;
     while (*gids_arr != -1 && size != 0)
     {
-
         /*an einai ektos oriwn skipareto*/
         if (*gids_arr < 0 || *gids_arr >= MG)
         {
             gids_arr++;
-            i--;
+            size--;
             continue;
         }
         /*EAN EINAI TO PRWTO*/
         if (G[*gids_arr]->gsub == NULL)
         {
-
             Subscription *subscription = (Subscription *)malloc(sizeof(Subscription));
             subscription->sId = sId;
             subscription->snext = NULL;
@@ -187,19 +170,18 @@ int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_ar
  * @return 0 on success
  *          1 on failure
  */
-int Prune(int tm)
+int Prune(int tm, SymTable_S *table)
 {
+    Info *info = getInfoForPrune(G[0]->gr, tm);
     int i = 1;
     for (i = 0; i < MG; i++)
     {
-        Info *info = getInfoForPrune(G[i]->gr, tm);
-
         while (info != NULL)
         {
             info = getInfoForPrune(G[i]->gr, tm);
             if (info != NULL)
             {
-                SubTgpUpdate(i, info);
+                SubTgpUpdate(i, info, table);
                 G[i]->gr = BST_delete(G[i]->gr, info);
             }
         }
@@ -213,14 +195,12 @@ Info *getInfoForPrune(Info *root, int key)
     root = getInfoForPrune(root->ilc, key);
     return root;
 }
-void SubTgpUpdate(int gId, Info *info)
+void SubTgpUpdate(int gId, Info *info, SymTable_S *table)
 {
     Subscription *subscription = G[gId]->gsub;
-
-    // printf("AAAAA   %d   %d   %d\n", info->itm, gId, sub->sId);
     while (subscription != NULL)
     {
-        SubInfo *sub = SL_LookUp(first_sub, subscription->sId);
+        SubInfo *sub = SymTable_get(table, subscription->sId);
         /*an einai to prwto*/
         if (sub->tgp[gId] == (TreeInfo *)1 || sub->tgp[gId] == NULL)
             sub->tgp[gId] = TreeInfoConstractor(info->iId, info->itm);
@@ -305,7 +285,7 @@ int Delete_Subscriber(int sId)
     if (SL_delete(&first_sub, tmp))
         return 1;
     /*print if succed*/
-    printSubs(&first_sub);
+    // printSubs(&first_sub);
     printf("\n");
     for (i = 0; i < MG; i++)
     {
@@ -327,17 +307,17 @@ void printSubsTgpInfo(SubInfo **sub);
  * @return 0 on success
  *          1 on failure
  */
-int Print_all(void)
+int Print_all(SymTable_S *table)
 {
     int i;
 
     printGroups();
     printf("\n");
-    printSubs(&first_sub);
+    printSubs(table);
     printf("\n");
-    i = printAllSubs(&first_sub);
+    i = printAllSubs(table);
     printf("   NO_GROUPS = <%d> ,NO_SUBSCRIBERS <%d>\n", MG, i);
-    printSubsTgpInfo(&first_sub);
+    // printSubsTgpInfo(&first_sub);
 
     return 0;
 }
@@ -641,21 +621,22 @@ void printSubsTgpInfo(SubInfo **sub)
  *
  * @param sub
  */
-void printSubs(SubInfo **sub)
+void printSubs(SymTable_S *table)
 {
     SubInfo *curr;
-    curr = *sub;
-    printf("   SUBSCRIBERELIST = <");
-    while (curr != NULL)
-    {
-        if (curr->snext == NULL)
-            printf(" %d ", curr->sId);
-        else
-            printf(" %d ,", curr->sId);
-        curr = curr->snext;
-    }
+    printf("SUBSCRIBERERS <");
+    int i = 0;
+    for (i; i < table->buckets; i++)
+        if (table->Subs[i] != NULL)
+        {
+            curr = table->Subs[i];
+            while (curr != NULL)
+            {
+                printf(" %d,", curr->sId);
+                curr = curr->snext;
+            }
+        }
     printf(">\n");
-
     return;
 }
 
@@ -665,19 +646,24 @@ void printSubs(SubInfo **sub)
  *
  * @param sub
  */
-int printAllSubs(SubInfo **sub)
+int printAllSubs(SymTable_S *table)
 {
     int size = 0;
+    int i = 0;
     SubInfo *curr;
-    curr = *sub;
-    while (curr != NULL)
-    {
-        printf("   SUBSCRIBERERID = <%d> ,", curr->sId);
-        print_sgp(curr);
-        printf("\n");
-        curr = curr->snext;
-        size++;
-    }
+    for (i; i < table->buckets; i++)
+        if (table->Subs[i] != NULL)
+        {
+            curr = table->Subs[i];
+            while (curr != NULL)
+            {
+                printf("SUBSCRIBERERID = <%d> ", curr->sId);
+                print_sgp(curr);
+                printf("\n");
+                curr = curr->snext;
+                size++;
+            }
+        }
 
     return size;
 }

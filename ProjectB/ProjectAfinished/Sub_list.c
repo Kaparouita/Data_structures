@@ -91,13 +91,12 @@ int is_MG_limits(int id)
 int Sub_Insert(SubInfo **head_ref, SubInfo *newSub)
 {
     SubInfo *current;
-
     /*IF EMPTY*/
     if (isSubEmpty(*head_ref) || isSubEmpty(newSub))
         return 1;
     current = *head_ref;
     /*CHECK IF ITS THE FIRST ELEMENT*/
-    if (newSub->stm < first_sub->stm)
+    if (newSub->stm < current->stm)
     {
         newSub->snext = *head_ref;
         *head_ref = newSub;
@@ -109,7 +108,7 @@ int Sub_Insert(SubInfo **head_ref, SubInfo *newSub)
     }
     /*ean yparxei*/
     if (current->snext != NULL && current->snext->sId == newSub->sId)
-        return 0;
+        return 1;
     newSub->snext = current->snext;
     current->snext = newSub;
 
@@ -208,29 +207,6 @@ void printSubsInfo(SubInfo **sub)
 }
 
 /**
- * @brief Print Subscriberlist ids
- *
- * @param sub
- */
-void printSubs(SubInfo **sub)
-{
-    SubInfo *curr;
-    curr = *sub;
-    printf("   SUBSCRIBERELIST = <");
-    while (curr != NULL)
-    {
-        if (curr->snext == NULL)
-            printf(" %d ", curr->sId);
-        else
-            printf(" %d ,", curr->sId);
-        curr = curr->snext;
-    }
-    printf(">\n");
-
-    return;
-}
-
-/**
  * @brief Print all sub list given head (first_sub)
  * also returns the size of the sublist
  *
@@ -272,6 +248,7 @@ void print_sgp(SubInfo *Sub)
     printf(">");
 }
 
+/*
 int main()
 {
     int a[6] = {31, 5, 6, 45, 1, -1};
@@ -299,4 +276,4 @@ int main()
     //  printSubs(&first_sub);
 
     return 0;
-}
+}*/

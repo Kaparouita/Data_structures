@@ -22,6 +22,7 @@ typedef struct SubInfo SubInfo;
 typedef struct TreeInfo TreeInfo;
 typedef struct Subscription Subscription;
 typedef struct Group Group;
+typedef struct SymTable_S SymTable_S;
 
 struct Info
 {
@@ -60,6 +61,13 @@ struct TreeInfo
     struct TreeInfo *tp;
     struct TreeInfo *next;
 };
+struct SymTable_S
+{
+    SubInfo **Subs;
+    int buckets;
+    int length;
+    unsigned hs; /*hash multiplier*/
+};
 
 /**
  * @brief Optional function to initialize data structures that
@@ -71,7 +79,7 @@ struct TreeInfo
  * @return 0 on success
  *         1 on failure
  */
-int initialize(int m, int p);
+int initialize(int m, int p, SymTable_S **table);
 
 /**
  * @brief Free resources
@@ -103,7 +111,7 @@ int Insert_Info(int iTM, int iId, int *gids_arr, int size_of_gids_arr);
  * @return 0 on success
  *          1 on failure
  */
-int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr);
+int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_arr, SymTable_S *table);
 
 /**
  * @brief Prune Information from server and forward it to client
@@ -112,7 +120,7 @@ int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_ar
  * @return 0 on success
  *          1 on failure
  */
-int Prune(int tm);
+int Prune(int tm, SymTable_S *table);
 
 /**
  * @brief Consume Information for subscriber
@@ -138,7 +146,7 @@ int Delete_Subscriber(int sId);
  * @return 0 on success
  *          1 on failure
  */
-int Print_all(void);
+int Print_all(SymTable_S *table);
 
 /*=====================MYFUCTIONS==================*/
 /**
@@ -166,7 +174,7 @@ void printSubscriptions(Subscription **sub);
  *
  * @param sub
  */
-int printAllSubs(SubInfo **sub);
+int printAllSubs(SymTable_S *table);
 /**
  * @brief init the sgp of a sub
  *
@@ -312,7 +320,7 @@ SubInfo *SL_LookUp(SubInfo *head, int ID);
  */
 
 /*====================EXTRA PRINTS====================*/
-void printSubs(SubInfo **sub);
+void printSubs(SymTable_S *table);
 void print_sgp(SubInfo *Sub);
 
 void printGroups();
@@ -335,6 +343,14 @@ TreeInfo *TreeInfoConstractor(int tId, int ttm);
 void printTree(TreeInfo *root);
 void printTreeID(TreeInfo *root);
 Info *getInfoForPrune(Info *root, int tm);
-void SubTgpUpdate(int gId, Info *info);
+void SubTgpUpdate(int gId, Info *info, SymTable_S *table);
+int SL_delete(SubInfo **head, SubInfo *sub);
+
+static unsigned int SymTable_hash(int subinfo_ID, SymTable_S *table);
+SymTable_S *SymTable_new(int BUCKETS, unsigned hs);
+int SymTable_contains(SymTable_S *table, SubInfo *sub);
+int SymTable_remove(SymTable_S *table, SubInfo *sub);
+SubInfo *SymTable_get(SymTable_S *table, int sId);
+int SymTable_insert(SymTable_S *table, SubInfo *subinfo);
 
 #endif /* pss_h */

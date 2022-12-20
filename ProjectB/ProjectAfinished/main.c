@@ -84,6 +84,7 @@ static int *event_args(char *buff, unsigned int *int_arr_size)
 int main(int argc, char **argv)
 {
 	FILE *fin = NULL;
+	SymTable_S *table;
 	char buff[BUFFER_SIZE], event = '\0';
 
 	/* Check command buff arguments */
@@ -120,7 +121,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Initializations */
-	initialize(hashTableSize, universalHashingNumber);
+	initialize(hashTableSize, universalHashingNumber, &table);
 
 	/* Read input file buff-by-buff and handle the events */
 	while (fgets(buff, BUFFER_SIZE, fin))
@@ -173,7 +174,7 @@ int main(int argc, char **argv)
 			sId = event_args_arr[1];
 			gids_arr = event_args_arr + 2;
 			num_of_gids -= 2;
-			if (Subscriber_Registration(sTM, sId, gids_arr, num_of_gids) == 0)
+			if (Subscriber_Registration(sTM, sId, gids_arr, num_of_gids, table) == 0)
 			{
 				DPRINT("%c <%d> <%d> DONE\n", buff[0], sTM, sId);
 			}
@@ -192,7 +193,7 @@ int main(int argc, char **argv)
 		{
 			int tm;
 			sscanf(buff, "%c %d", &event, &tm);
-			if (Prune(tm) == 0)
+			if (Prune(tm, table) == 0)
 			{
 				DPRINT("%c <%d> DONE\n", event, tm);
 			}
@@ -241,7 +242,7 @@ int main(int argc, char **argv)
 		 * P */
 		case 'P':
 		{
-			if (Print_all() == 0)
+			if (Print_all(table) == 0)
 			{
 				DPRINT("%c DONE\n", buff[0]);
 			}

@@ -179,14 +179,8 @@ void printInorder(Info *node)
 {
     if (node == NULL)
         return;
-
-    /* first recur on left child */
     printInorder(node->ilc);
-
-    /* then print the data of node */
     printf("%d , ", node->iId);
-
-    /* now recur on right child */
     printInorder(node->irc);
 }
 

@@ -333,29 +333,158 @@ int FreeInfos(Info *head);
 int freeSubs();
 int freeGroups();
 
+/**
+ * @brief insert INFO to the tree
+ *
+ * @param root
+ * @param new_info
+ * @return Info* || NULL if fails
+ */
 Info *BST_insert(Info *root, Info *new_info);
+/**
+ * @brief look up for the info
+ *
+ * @param root
+ * @param key
+ * @return Info* || NULL if fails
+ */
 Info *BST_search(Info *root, int key);
+/**
+ * @brief delete an info
+ *
+ * @param root
+ * @param del
+ * @return Info* || NULL if fails
+ */
 Info *BST_delete(Info *root, Info *del);
+/**
+ * @brief print the tree
+ *
+ * @param root
+ */
 void printBST(Info *root);
+/**
+ * @brief Print the tree Inorder
+ *
+ * @param node
+ */
 void printInorder(Info *node);
 
+/**
+ * @brief Insert a new Treeinfo to the tree
+ *
+ * @param root  the root
+ * @param new   the new info
+ * @param parent this is just helpful for the fuction you can NULL it
+ * @return TreeInfo*
+ */
 TreeInfo *Insert_TI(TreeInfo *root, TreeInfo *new, TreeInfo *parent);
+/**
+ * @brief creates a TreeInfo object with tId ttm
+ *
+ * @param tId
+ * @param ttm
+ * @return TreeInfo*
+ */
 TreeInfo *TreeInfoConstractor(int tId, int ttm);
+/**
+ * @brief prints Treeinfo ttm values
+ *
+ * @param root
+ */
 void printTree(TreeInfo *root);
+/**
+ * @brief prints Treeinfo ID values
+ *
+ * @param root
+ */
 void printTreeID(TreeInfo *root);
-void printInorderTree(TreeInfo *node);
+/**
+ * @brief print the leafs of the tree also return the last leaf
+ *
+ * @param root
+ * @return TreeInfo*
+ */
 TreeInfo *PrintTreeList(TreeInfo *root);
 
+/**
+ * @brief Get the Info For Prune object
+ *
+ * @param root
+ * @param tm
+ * @return Info*
+ */
 Info *getInfoForPrune(Info *root, int tm);
+/**
+ * @brief updates tgp after prune
+ *
+ * @param gId
+ * @param info
+ * @param table
+ */
 void SubTgpUpdate(int gId, Info *info, SymTable_S *table);
+/**
+ * @brief deletes a sub given head of the list
+ *
+ * @param head
+ * @param sub
+ * @return 1 if fails || 0 if succed
+ */
 int SL_delete(SubInfo **head, SubInfo *sub);
+/**
+ * @brief given a sub prints its tgp TREE
+ *
+ * @param sub
+ */
 void printSubsTgpInfo(SubInfo **sub);
 
+/**
+ * @brief hash fuction
+ *
+ * @param subinfo_ID
+ * @param table
+ * @return unsigned int
+ */
 static unsigned int SymTable_hash(int subinfo_ID, SymTable_S *table);
+/**
+ * @brief creates a new hash_table object
+ *
+ * @param BUCKETS
+ * @param hs
+ * @return SymTable_S*
+ */
 SymTable_S *SymTable_new(int BUCKETS, unsigned hs);
+/**
+ * @brief checks if the table contains a specific sub
+ *
+ * @param table
+ * @param sub
+ * @return 0 if true else 1
+ */
 int SymTable_contains(SymTable_S *table, SubInfo *sub);
+/**
+ * @brief removes a sub from the table
+ *
+ * @param table
+ * @param sub
+ * @return int
+ */
 int SymTable_remove(SymTable_S *table, SubInfo *sub);
+/**
+ * @brief get a sub given its ID from the table
+ *
+ * @param table
+ * @param sId
+ * @return The sub || NULL if its not there
+ */
 SubInfo *SymTable_get(SymTable_S *table, int sId);
+/**
+ * @brief insert a sub to the table
+ *
+ * @param table
+ * @param subinfo
+ * @return int
+ */
 int SymTable_insert(SymTable_S *table, SubInfo *subinfo);
 
 #endif /* pss_h */

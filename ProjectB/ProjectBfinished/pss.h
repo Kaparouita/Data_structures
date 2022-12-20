@@ -129,7 +129,7 @@ int Prune(int tm, SymTable_S *table);
  * @return 0 on success
  *          1 on failure
  */
-int Consume(int sId);
+int Consume(int sId, SymTable_S *table);
 
 /**
  * @brief Delete subscriber
@@ -138,7 +138,7 @@ int Consume(int sId);
  * @return 0 on success
  *          1 on failure
  */
-int Delete_Subscriber(int sId);
+int Delete_Subscriber(int sId, SymTable_S *table);
 
 /**
  * @brief Print Data Structures of the system
@@ -338,13 +338,18 @@ Info *BST_search(Info *root, int key);
 Info *BST_delete(Info *root, Info *del);
 void printBST(Info *root);
 void printInorder(Info *node);
+
 TreeInfo *Insert_TI(TreeInfo *root, TreeInfo *new, TreeInfo *parent);
 TreeInfo *TreeInfoConstractor(int tId, int ttm);
 void printTree(TreeInfo *root);
 void printTreeID(TreeInfo *root);
+void printInorderTree(TreeInfo *node);
+TreeInfo *PrintTreeList(TreeInfo *root);
+
 Info *getInfoForPrune(Info *root, int tm);
 void SubTgpUpdate(int gId, Info *info, SymTable_S *table);
 int SL_delete(SubInfo **head, SubInfo *sub);
+void printSubsTgpInfo(SubInfo **sub);
 
 static unsigned int SymTable_hash(int subinfo_ID, SymTable_S *table);
 SymTable_S *SymTable_new(int BUCKETS, unsigned hs);

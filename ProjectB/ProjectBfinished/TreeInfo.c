@@ -126,6 +126,24 @@ TreeInfo *GetListRoot(TreeInfo *root)
         root = root->tlc;
     return root;
 }
+/**
+ * @brief return the last element(the most right one)
+ *
+ * @param root
+ * @return TreeInfo*
+ */
+TreeInfo *PrintTreeList(TreeInfo *root)
+{
+    while (root->tlc != NULL)
+        root = root->tlc;
+    while (root->next != NULL)
+    {
+        printf("%d ,", root->tId);
+        root = root->next;
+    }
+    printf("%d", root->tId);
+    return root;
+}
 void pl(TreeInfo *root)
 {
     while (root != NULL)

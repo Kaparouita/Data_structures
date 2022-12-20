@@ -126,10 +126,8 @@ int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_ar
 {
 
     int size = size_of_gids_arr;
-
     /*ADD SUB TO SUBINFO*/
     SubInfo *new_sub = SubInfoConstractor(sId, sTM, gids_arr, size);
-
     SymTable_insert(table, new_sub);
     /*-------------------------CHANGE THE PRINT CAUSE TABLE-----------------------------------*/
     printSubs(table); /*print subs*/
@@ -159,7 +157,6 @@ int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_ar
         gids_arr++;
         size--;
     }
-
     return 0;
 }
 
@@ -172,10 +169,10 @@ int Subscriber_Registration(int sTM, int sId, int *gids_arr, int size_of_gids_ar
  */
 int Prune(int tm, SymTable_S *table)
 {
-    Info *info = getInfoForPrune(G[0]->gr, tm);
     int i = 1;
     for (i = 0; i < MG; i++)
     {
+        Info *info = getInfoForPrune(G[i]->gr, tm);
         while (info != NULL)
         {
             info = getInfoForPrune(G[i]->gr, tm);
@@ -183,17 +180,27 @@ int Prune(int tm, SymTable_S *table)
             {
                 SubTgpUpdate(i, info, table);
                 G[i]->gr = BST_delete(G[i]->gr, info);
+                // print_prune(i,)
             }
         }
     }
+    printGroups();
+    printAllSubs(table);
     return EXIT_SUCCESS;
 }
+
+// void print_prune(int i, )
+
 Info *getInfoForPrune(Info *root, int key)
 {
+    Info *l, *r;
     if (root == NULL || root->itm <= key)
         return root;
-    root = getInfoForPrune(root->ilc, key);
-    return root;
+    l = getInfoForPrune(root->ilc, key);
+    r = getInfoForPrune(root->irc, key);
+    if (l != NULL && l->itm <= key)
+        return l;
+    return r;
 }
 void SubTgpUpdate(int gId, Info *info, SymTable_S *table)
 {
@@ -218,11 +225,11 @@ void SubTgpUpdate(int gId, Info *info, SymTable_S *table)
  * @return 0 on success
  *          1 on failure
  */
-int Consume(int sId)
+int Consume(int sId, SymTable_S *table)
 {
     int i = 0;
     SubInfo *sub;
-    sub = SL_LookUp(first_sub, sId);
+    sub = SymTable_get(table, sId);
     /*an den yparxei to sub*/
     if (isSubEmpty(sub))
         return 1;
@@ -230,10 +237,8 @@ int Consume(int sId)
     for (i; i < MG; i++)
     {
         /*an den einai ==1 kane consume*/
-        if (sub->sgp[i] != (TreeInfo *)1)
-        {
-        }
-        // consume_print(sub, i);
+        if (sub->tgp[i] != (TreeInfo *)1)
+            consume_print(sub, i);
     }
     return 0;
 }
@@ -243,31 +248,30 @@ int Consume(int sId)
  * @param sub
  * @param gID
  */
-/* int consume_print(SubInfo *sub, int gID)
+int consume_print(SubInfo *sub, int gID)
 {
     printf("   GROUPID = <%d>,", gID);
     printf("INFOLIST = <");
-    Info *curr_info = sub->sgp[gID];
-    //Ean deixnei se NULL(To group den exei info)
-    if (curr_info == NULL)
+    TreeInfo *curr_info;
+    if (sub->sgp[gID] == NULL || sub->sgp[gID] == (TreeInfo *)1)
+        sub->sgp[gID] = sub->tgp[gID];
+    curr_info = sub->sgp[gID];
+    // Ean deixnei se NULL(To group den exei info)
+    if (curr_info == NULL || curr_info == (TreeInfo *)1)
     {
         printf("%p>,", curr_info);
         printf("NEWSGP = <");
         printf("%p>\n", curr_info);
         return 0;
     }
-    while (curr_info != NULL)
-    {
-        printf(" %d ,", curr_info->iId);
-        curr_info = curr_info->inext;
-    }
+    curr_info = PrintTreeList(curr_info);
     printf(">,NEWSGP = <");
-    //update sgp pointer
-    //sub->sgp[gID] = prev;
-    sub->sgp[gID] = G[gID]->glast;
-    printf("%d>\n", sub->sgp[gID]->iId);
+    // update sgp pointer
+    // sub->sgp[gID] = prev;
+    sub->sgp[gID] = curr_info;
+    printf("%d>\n", sub->sgp[gID]->tId);
     return 0;
-}*/
+}
 /**
  * @brief Delete subscriber
  *
@@ -275,17 +279,17 @@ int Consume(int sId)
  * @return 0 on success
  *          1 on failure
  */
-int Delete_Subscriber(int sId)
+int Delete_Subscriber(int sId, SymTable_S *table)
 {
     int i;
-    SubInfo *tmp = SL_LookUp(first_sub, sId);
+    SubInfo *tmp = SymTable_get(table, sId);
     if (tmp == NULL)
         return 1;
     /*delete the sub*/
-    if (SL_delete(&first_sub, tmp))
+    if (SymTable_remove(table, tmp))
         return 1;
     /*print if succed*/
-    // printSubs(&first_sub);
+    printSubs(table);
     printf("\n");
     for (i = 0; i < MG; i++)
     {
@@ -300,7 +304,6 @@ int Delete_Subscriber(int sId)
     }
     return 0;
 }
-void printSubsTgpInfo(SubInfo **sub);
 /**
  * @brief Print Data Structures of the system
  *
@@ -317,7 +320,6 @@ int Print_all(SymTable_S *table)
     printf("\n");
     i = printAllSubs(table);
     printf("   NO_GROUPS = <%d> ,NO_SUBSCRIBERS <%d>\n", MG, i);
-    // printSubsTgpInfo(&first_sub);
 
     return 0;
 }
@@ -439,7 +441,7 @@ void SubSgpINIT(SubInfo *sub, int *p_sgp, int p_size)
     /*INIT OLA ME 1*/
     for (i = 0; i < MG; i++)
     {
-        sub->sgp[i] = (TreeInfo *)1;
+        sub->sgp[i] = NULL;
         sub->tgp[i] = (TreeInfo *)1;
     }
     while (*p_sgp != -1 && p_size > 0)
@@ -479,18 +481,10 @@ int is_MG_limits(int id)
 int Sub_Insert(SubInfo **head_ref, SubInfo *newSub)
 {
     SubInfo *current;
-
     /*IF EMPTY*/
     if (isSubEmpty(*head_ref) || isSubEmpty(newSub))
         return 1;
     current = *head_ref;
-    /*CHECK IF ITS THE FIRST ELEMENT*/
-    if (newSub->stm < first_sub->stm)
-    {
-        newSub->snext = *head_ref;
-        *head_ref = newSub;
-        return 0;
-    }
     while (current->snext != NULL && current->snext->stm < newSub->stm)
     {
         current = current->snext;
@@ -657,7 +651,7 @@ int printAllSubs(SymTable_S *table)
             curr = table->Subs[i];
             while (curr != NULL)
             {
-                printf("SUBSCRIBERERID = <%d> ", curr->sId);
+                printf("SUBSCRIBERERID = <%d>\n", curr->sId);
                 print_sgp(curr);
                 printf("\n");
                 curr = curr->snext;
@@ -676,15 +670,16 @@ int printAllSubs(SymTable_S *table)
 void print_sgp(SubInfo *Sub)
 {
     int i;
-    printf("GROUPLIST = <");
     for (i = 0; i < MG; i++)
     {
-        if (Sub->sgp[i] != (TreeInfo *)1)
+        if (Sub->tgp[i] != (TreeInfo *)1 && Sub->tgp[i] != NULL)
         {
-            printf(" %d ,", i);
+            printf("GROUPLIST = <%d> ,", i);
+            printf(" TREELIST = <");
+            PrintTreeList(Sub->tgp[i]);
+            printf(">\n");
         }
     }
-    printf(">");
 }
 
 /**

@@ -210,7 +210,7 @@ int main(int argc, char **argv)
 		{
 			int sId;
 			sscanf(buff, "%c %d", &event, &sId);
-			if (Consume(sId) == 0)
+			if (Consume(sId, table) == 0)
 			{
 				DPRINT("%c <%d> DONE\n", event, sId);
 			}
@@ -227,7 +227,7 @@ int main(int argc, char **argv)
 		{
 			int sId;
 			sscanf(buff, "%c %d", &event, &sId);
-			if (Delete_Subscriber(sId) == 0)
+			if (Delete_Subscriber(sId, table) == 0)
 			{
 				DPRINT("%c <%d> DONE\n", event, sId);
 			}
